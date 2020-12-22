@@ -35,6 +35,7 @@ func ListObjects(bucketName, prefix string) []Object {
 			if object.Size > 0 {
 				objectInfo, _ = client.StatObject(ctx, bucketName, object.Key, minio.StatObjectOptions{})
 			}
+
 			objectList = append(objectList, Object{
 				ContentType:  objectInfo.ContentType,
 				Name:         object.Key,
