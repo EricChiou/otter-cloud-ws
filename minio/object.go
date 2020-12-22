@@ -25,18 +25,21 @@ func ListObjects(bucketName, prefix string) []Object {
 	}
 	opts := minio.ListObjectsOptions{
 		Prefix:    prefix,
-		Recursive: true,
+		Recursive: false,
 	}
 
 	var objectList []Object
 	for object := range client.ListObjects(ctx, bucketName, opts) {
 		if object.Err == nil {
-			objectInfo, _ := client.StatObject(ctx, bucketName, object.Key, minio.StatObjectOptions{})
+			var objectInfo minio.ObjectInfo
+			if object.Size > 0 {
+				objectInfo, _ = client.StatObject(ctx, bucketName, object.Key, minio.StatObjectOptions{})
+			}
 			objectList = append(objectList, Object{
 				ContentType:  objectInfo.ContentType,
-				Name:         objectInfo.Key,
-				Size:         objectInfo.Size,
-				LastModified: objectInfo.LastModified,
+				Name:         object.Key,
+				Size:         object.Size,
+				LastModified: object.LastModified,
 			})
 		}
 	}

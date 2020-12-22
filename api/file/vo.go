@@ -4,7 +4,7 @@ package file
 
 // ListReqVo get file list request vo
 type ListReqVo struct {
-	Prefix string `json:"prefix" req:"true"`
+	Prefix string `json:"prefix" req:"false"`
 }
 
 // respone vo
