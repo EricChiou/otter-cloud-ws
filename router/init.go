@@ -14,6 +14,7 @@ import (
 func Init() {
 	initUserAPI()
 	initCodemapAPI()
+	initFileAPI()
 }
 
 // ListenAndServe start http server

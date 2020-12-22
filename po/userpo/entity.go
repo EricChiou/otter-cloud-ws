@@ -14,7 +14,7 @@ const (
 	Name        string = "name"
 	RoleCode    string = "role_code"
 	Status      string = "status"
-	BucketID    string = "bucket_id"
+	BucketName  string = "bucket_name"
 	CreatedDate string = "created_date"
 	UpdatedDate string = "updated_date"
 )
@@ -27,7 +27,7 @@ type Entity struct {
 	Name        string `json:"name,omitempty"`
 	RoleCode    string `json:"roleCode,omitempty"`
 	Status      string `json:"status,omitempty"`
-	BucketID    string `json:"bucket_id,omitempty"`
+	BucketName  string `json:"bucket_name,omitempty"`
 	CreatedDate string `json:"creatDate,omitempty"`
 	UpdatedDate string `json:"updateDate,omitempty"`
 }

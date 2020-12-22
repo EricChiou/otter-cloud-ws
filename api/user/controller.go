@@ -74,7 +74,7 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 		signInBo.Name,
 		signInBo.RoleCode,
 		signInBo.Name,
-		signInBo.BucketID,
+		signInBo.BucketName,
 	)
 	signInResVo = SignInResVo{
 		Token: token,

@@ -11,17 +11,17 @@ import (
 
 // Payload jwt payload struct
 type Payload struct {
-	ID       int    `json:"id"`
-	Acc      string `json:"acc"`
-	Name     string `json:"name"`
-	RoleCode string `json:"roleCode"`
-	RoleName string `json:"roleName"`
-	BucketID string `json:"bucketId"`
-	Exp      int64  `json:"exp"`
+	ID         int    `json:"id"`
+	Acc        string `json:"acc"`
+	Name       string `json:"name"`
+	RoleCode   string `json:"roleCode"`
+	RoleName   string `json:"roleName"`
+	BucketName string `json:"bucketName"`
+	Exp        int64  `json:"exp"`
 }
 
 // Generate generate jwt
-func Generate(userID int, acc, name, roleCode, roleName, bucketID string) (string, error) {
+func Generate(userID int, acc, name, roleCode, roleName, bucketName string) (string, error) {
 	cfg := config.Get()
 	jwtExpire, err := strconv.Atoi(cfg.JWTExpire)
 	if err != nil {
@@ -29,13 +29,13 @@ func Generate(userID int, acc, name, roleCode, roleName, bucketID string) (strin
 	}
 
 	payload := Payload{
-		ID:       userID,
-		Acc:      acc,
-		Name:     name,
-		RoleCode: roleCode,
-		RoleName: roleName,
-		BucketID: bucketID,
-		Exp:      time.Now().Unix() + int64(jwtExpire*86400),
+		ID:         userID,
+		Acc:        acc,
+		Name:       name,
+		RoleCode:   roleCode,
+		RoleName:   roleName,
+		BucketName: bucketName,
+		Exp:        time.Now().Unix() + int64(jwtExpire*86400),
 	}
 	return jwt.GenerateJWT(payload, string(config.JwtAlg), cfg.JWTKey)
 }

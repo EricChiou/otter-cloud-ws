@@ -8,8 +8,8 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-// GetUserBucketID get user minio bucket id
-func GetUserBucketID(acc string) string {
+// GetUserBucketName get user minio bucket id
+func GetUserBucketName(acc string) string {
 	cfg := config.Get()
 
 	return sha3.Encrypt(acc+"_"+cfg.BucketHashKey, 224)
@@ -17,11 +17,11 @@ func GetUserBucketID(acc string) string {
 
 // CreateUserBucket create user minio bucket
 func CreateUserBucket(acc string) error {
-	bucketID := GetUserBucketID(acc)
+	bucketName := GetUserBucketName(acc)
 
 	return client.MakeBucket(
 		context.Background(),
-		bucketID,
+		bucketName,
 		minio.MakeBucketOptions{Region: "ap-east-1"},
 	)
 }

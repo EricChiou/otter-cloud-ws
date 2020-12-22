@@ -31,11 +31,11 @@ func (dao *Dao) SignUp(signUp SignUpReqVo) error {
 		encryptPwd := sha3.Encrypt(signUp.Pwd)
 
 		// minio bucket id
-		bucketID := minio.GetUserBucketID(signUp.Acc)
+		bucketName := minio.GetUserBucketName(signUp.Acc)
 
-		g.SQL.Insert(userpo.Table, userpo.Acc, userpo.Pwd, userpo.Name, userpo.Status, userpo.BucketID).
+		g.SQL.Insert(userpo.Table, userpo.Acc, userpo.Pwd, userpo.Name, userpo.Status, userpo.BucketName).
 			Values("?", "?", "?", "?", "?")
-		g.AddValues(signUp.Acc, encryptPwd, signUp.Name, userstatus.Active, bucketID)
+		g.AddValues(signUp.Acc, encryptPwd, signUp.Name, userstatus.Active, bucketName)
 
 		if _, err := dao.gooq.Exec(g.SQL.GetSQL(), g.Args...); err != nil {
 			return err
@@ -60,7 +60,7 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 		userpo.RoleCode,
 		userpo.Status,
 		rolepo.Table+"."+rolepo.Name,
-		userpo.BucketID,
+		userpo.BucketName,
 	).
 		From(userpo.Table).
 		Join(rolepo.Table).On(c(userpo.RoleCode).Eq(rolepo.Code)).
@@ -76,7 +76,7 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 			&signInBo.RoleCode,
 			&signInBo.Status,
 			&signInBo.RoleName,
-			&signInBo.BucketID,
+			&signInBo.BucketName,
 		); err != nil {
 			return err
 		}
