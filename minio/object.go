@@ -9,10 +9,10 @@ import (
 
 // Object file struct
 type Object struct {
-	ContentType  string
-	Name         string
-	Size         int64
-	LastModified time.Time
+	ContentType  string    `json:"contentType"`
+	Name         string    `json:"name"`
+	Size         int64     `json:"size"`
+	LastModified time.Time `json:"lastModified"`
 }
 
 // ListObjects lists objects in a bucket.
