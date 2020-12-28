@@ -3,7 +3,6 @@ package file
 import (
 	"encoding/base64"
 	"errors"
-	"fmt"
 	"otter-cloud-ws/constants/api"
 	"otter-cloud-ws/interceptor"
 	"otter-cloud-ws/minio"
@@ -72,8 +71,6 @@ func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.R
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
-
-	fmt.Println(url.String())
 
 	resVo := GetPreviewURLResVo{URL: base64.StdEncoding.EncodeToString([]byte(url.String()))}
 	return responseEntity.OK(ctx, resVo)

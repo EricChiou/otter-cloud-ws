@@ -2,7 +2,6 @@ package minio
 
 import (
 	"context"
-	"fmt"
 	"mime/multipart"
 	"net/url"
 	"time"
@@ -69,7 +68,6 @@ func PresignedGetObject(bucketName, prefix, fileName string) (*url.URL, error) {
 	reqParams := make(url.Values)
 	reqParams.Set("response-content-disposition", "attachment; filename=\""+fileName+"\"")
 
-	fmt.Println(prefix + fileName)
 	url, err := client.PresignedGetObject(ctx, bucketName, prefix+fileName, time.Second*60*5, reqParams)
 	return url, err
 }
