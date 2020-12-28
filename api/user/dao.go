@@ -2,7 +2,6 @@ package user
 
 import (
 	"database/sql"
-	"fmt"
 	"otter-cloud-ws/api/common"
 	"otter-cloud-ws/bo/userbo"
 	"otter-cloud-ws/constants/userstatus"
@@ -85,9 +84,6 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 
 	// check account existing
 	if err := dao.gooq.QueryRow(g.SQL.GetSQL(), rowMapper, g.Args...); err != nil {
-		fmt.Println(g.SQL.GetSQL())
-		fmt.Println(g.Args)
-		fmt.Println(err)
 		return signInBo, err
 	}
 

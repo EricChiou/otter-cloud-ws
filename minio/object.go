@@ -2,7 +2,9 @@ package minio
 
 import (
 	"context"
+	"fmt"
 	"mime/multipart"
+	"net/url"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -58,4 +60,16 @@ func PutObject(bucketName, prefix string, fileHeader *multipart.FileHeader) erro
 
 	_, err := client.PutObject(ctx, bucketName, prefix+fileHeader.Filename, file, fileHeader.Size, putObjectOptions)
 	return err
+}
+
+// PresignedGetObject generates a presigned URL for HTTP GET operations
+func PresignedGetObject(bucketName, prefix, fileName string) (*url.URL, error) {
+	ctx := context.Background()
+
+	reqParams := make(url.Values)
+	reqParams.Set("response-content-disposition", "attachment; filename=\""+fileName+"\"")
+
+	fmt.Println(prefix + fileName)
+	url, err := client.PresignedGetObject(ctx, bucketName, prefix+fileName, time.Second*60*5, reqParams)
+	return url, err
 }
