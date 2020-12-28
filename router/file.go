@@ -10,4 +10,7 @@ func initFileAPI() {
 
 	// Post
 	post(groupName+"/list", true, nil, controller.List)
+
+	// Put
+	put(groupName+"/upload", true, nil, controller.Upload)
 }

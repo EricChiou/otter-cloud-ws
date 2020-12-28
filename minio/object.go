@@ -2,6 +2,7 @@ package minio
 
 import (
 	"context"
+	"mime/multipart"
 	"time"
 
 	"github.com/minio/minio-go/v7"
@@ -46,4 +47,15 @@ func ListObjects(bucketName, prefix string) []Object {
 	}
 
 	return objectList
+}
+
+// PutObject upload file
+func PutObject(bucketName, prefix string, fileHeader *multipart.FileHeader) error {
+	ctx := context.Background()
+	putObjectOptions := minio.PutObjectOptions{ContentType: fileHeader.Header.Get("content-type")}
+	file, _ := fileHeader.Open()
+	defer file.Close()
+
+	_, err := client.PutObject(ctx, bucketName, prefix+fileHeader.Filename, file, fileHeader.Size, putObjectOptions)
+	return err
 }
