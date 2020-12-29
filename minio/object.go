@@ -62,12 +62,19 @@ func PutObject(bucketName, prefix string, fileHeader *multipart.FileHeader) erro
 }
 
 // PresignedGetObject generates a presigned URL for HTTP GET operations
-func PresignedGetObject(bucketName, prefix, fileName string) (*url.URL, error) {
+func PresignedGetObject(bucketName, prefix, fileName string, exp time.Duration) (*url.URL, error) {
 	ctx := context.Background()
 
 	reqParams := make(url.Values)
 	reqParams.Set("response-content-disposition", "attachment; filename=\""+fileName+"\"")
 
-	url, err := client.PresignedGetObject(ctx, bucketName, prefix+fileName, time.Second*60*5, reqParams)
+	url, err := client.PresignedGetObject(ctx, bucketName, prefix+fileName, exp, reqParams)
 	return url, err
+}
+
+// GetObject get object
+func GetObject(bucketName, prefix, fileName string) (*minio.Object, error) {
+	ctx := context.Background()
+
+	return client.GetObject(ctx, bucketName, prefix+fileName, minio.GetObjectOptions{})
 }

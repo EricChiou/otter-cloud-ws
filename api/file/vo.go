@@ -13,6 +13,12 @@ type GetPreviewURLReqVo struct {
 	FileName string `json:"fileName" req:"true"`
 }
 
+// DownloadFileReqVo download file request vo
+type DownloadFileReqVo struct {
+	Prefix   string `json:"prefix" req:"false"`
+	FileName string `json:"fileName" req:"true"`
+}
+
 // respone vo
 
 // GetPreviewURLResVo get preview url response vo

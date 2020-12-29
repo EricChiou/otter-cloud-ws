@@ -3,12 +3,14 @@ package file
 import (
 	"encoding/base64"
 	"errors"
+	"net/url"
 	"otter-cloud-ws/constants/api"
 	"otter-cloud-ws/interceptor"
 	"otter-cloud-ws/minio"
 	"otter-cloud-ws/service/apihandler"
 	"otter-cloud-ws/service/paramhandler"
 	"strings"
+	"time"
 )
 
 // Controller file controller
@@ -26,7 +28,8 @@ func (con *Controller) List(webInput interceptor.WebInput) apihandler.ResponseEn
 		return responseEntity.Error(ctx, api.FormatError, nil)
 	}
 
-	objectList := minio.ListObjects(webInput.Payload.BucketName, listReqVo.Prefix)
+	prefix, _ := url.QueryUnescape(listReqVo.Prefix)
+	objectList := minio.ListObjects(webInput.Payload.BucketName, prefix)
 
 	return responseEntity.OK(ctx, objectList)
 }
@@ -36,7 +39,7 @@ func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.Response
 	ctx := webInput.Context.Ctx
 
 	bucketName := webInput.Payload.BucketName
-	prefix := string(ctx.FormValue("prefix"))
+	prefix, _ := url.QueryUnescape(string(ctx.FormValue("prefix")))
 	if len(prefix) > 0 && !strings.HasSuffix(prefix, "/") {
 		prefix = prefix + "/"
 	}
@@ -67,11 +70,38 @@ func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.R
 
 	bucketName := webInput.Payload.BucketName
 
-	url, err := minio.PresignedGetObject(bucketName, reqVo.Prefix, reqVo.FileName)
+	url, err := minio.PresignedGetObject(bucketName, reqVo.Prefix, reqVo.FileName, time.Second*60*5)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
 	resVo := GetPreviewURLResVo{URL: base64.StdEncoding.EncodeToString([]byte(url.String()))}
 	return responseEntity.OK(ctx, resVo)
+}
+
+// Download file
+func (con *Controller) Download(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo DownloadFileReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, nil)
+	}
+
+	bucketName := webInput.Payload.BucketName
+	object, err := minio.GetObject(bucketName, reqVo.Prefix, reqVo.FileName)
+	if err != nil {
+		responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	objectInfo, err := object.Stat()
+	if err != nil {
+		responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
+	ctx.SetBodyStream(object, int(objectInfo.Size))
+
+	return responseEntity.Empty()
 }

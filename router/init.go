@@ -34,8 +34,9 @@ func SetHeader(key string, value string) {
 
 func newFHServer() *fasthttp.Server {
 	return &fasthttp.Server{
-		Name:    config.Get().ServerName,
-		Handler: httprouter.FasthttpHandler(),
+		Name:               config.Get().ServerName,
+		Handler:            httprouter.FasthttpHandler(),
+		MaxRequestBodySize: 5 * 1024 * 1024 * 1024 * 1024, // 5 TB
 	}
 }
 

@@ -9,11 +9,10 @@ func initFileAPI() {
 	var controller file.Controller
 
 	// Get
+	get(groupName+"/list", true, nil, controller.List)
 	get(groupName+"/preview", true, nil, controller.GetPreviewURL)
 
 	// Post
-	post(groupName+"/list", true, nil, controller.List)
-
-	// Put
-	put(groupName+"/upload", true, nil, controller.Upload)
+	post(groupName+"/upload", true, nil, controller.Upload)
+	post(groupName+"/download", true, nil, controller.Download)
 }
