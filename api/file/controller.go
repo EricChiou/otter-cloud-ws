@@ -69,8 +69,10 @@ func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.R
 	}
 
 	bucketName := webInput.Payload.BucketName
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	fileName, _ := url.QueryUnescape(reqVo.FileName)
 
-	url, err := minio.PresignedGetObject(bucketName, reqVo.Prefix, reqVo.FileName, time.Second*60*5)
+	url, err := minio.PresignedGetObject(bucketName, prefix, fileName, time.Second*60*5)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
