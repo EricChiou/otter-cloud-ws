@@ -34,7 +34,7 @@ func (con *Controller) List(webInput interceptor.WebInput) apihandler.ResponseEn
 	return responseEntity.OK(ctx, objectList)
 }
 
-// Upload files
+// Upload file
 func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
@@ -44,15 +44,13 @@ func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.Response
 		prefix = prefix + "/"
 	}
 
-	forms, _ := ctx.MultipartForm()
-	if forms == nil {
-		return responseEntity.Error(ctx, api.FormatError, errors.New("need formData which key is 'files'"))
+	fileHeader, _ := ctx.FormFile("file")
+	if fileHeader == nil {
+		return responseEntity.Error(ctx, api.FormatError, errors.New("need formData which key is 'file'"))
 	}
 
-	for _, fileHeader := range forms.File["files"] {
-		if err := minio.PutObject(bucketName, prefix, fileHeader); err != nil {
-			return responseEntity.Error(ctx, api.MinioError, err)
-		}
+	if err := minio.PutObject(bucketName, prefix, fileHeader); err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
 	return responseEntity.OK(ctx, nil)
