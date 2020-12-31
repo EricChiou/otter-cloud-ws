@@ -52,29 +52,78 @@ func ListObjects(bucketName, prefix string) []Object {
 
 // PutObject upload file
 func PutObject(bucketName, prefix string, fileHeader *multipart.FileHeader) error {
-	ctx := context.Background()
-	putObjectOptions := minio.PutObjectOptions{ContentType: fileHeader.Header.Get("content-type")}
 	file, _ := fileHeader.Open()
 	defer file.Close()
 
-	_, err := client.PutObject(ctx, bucketName, prefix+fileHeader.Filename, file, fileHeader.Size, putObjectOptions)
+	putObjectOptions := minio.PutObjectOptions{ContentType: fileHeader.Header.Get("content-type")}
+
+	_, err := client.PutObject(
+		context.Background(),
+		bucketName,
+		prefix+fileHeader.Filename,
+		file,
+		fileHeader.Size,
+		putObjectOptions,
+	)
 	return err
 }
 
 // PresignedGetObject generates a presigned URL for HTTP GET operations
 func PresignedGetObject(bucketName, prefix, fileName string, exp time.Duration) (*url.URL, error) {
-	ctx := context.Background()
-
 	reqParams := make(url.Values)
 	reqParams.Set("response-content-disposition", "attachment; filename=\""+fileName+"\"")
 
-	url, err := client.PresignedGetObject(ctx, bucketName, prefix+fileName, exp, reqParams)
-	return url, err
+	return client.PresignedGetObject(
+		context.Background(),
+		bucketName,
+		prefix+fileName,
+		exp,
+		reqParams,
+	)
 }
 
 // GetObject get object
 func GetObject(bucketName, prefix, fileName string) (*minio.Object, error) {
-	ctx := context.Background()
+	opts := minio.GetObjectOptions{}
 
-	return client.GetObject(ctx, bucketName, prefix+fileName, minio.GetObjectOptions{})
+	return client.GetObject(context.Background(), bucketName, prefix+fileName, opts)
+}
+
+// RemoveObject removes an object with some specified options
+func RemoveObject(bucketName, prefix, fileName string) error {
+	opts := minio.RemoveObjectOptions{
+		GovernanceBypass: true,
+	}
+
+	return client.RemoveObject(context.Background(), bucketName, prefix+fileName, opts)
+}
+
+// RemoveObjects removes a list of objects obtained from an input channel
+func RemoveObjects(bucketName, prefix, fileName string) error {
+	objectsCh := make(chan minio.ObjectInfo)
+	go func() {
+		defer close(objectsCh)
+
+		opts := minio.ListObjectsOptions{
+			Prefix:    prefix,
+			Recursive: false,
+		}
+		for object := range client.ListObjects(context.Background(), bucketName, opts) {
+			if object.Err == nil {
+				objectsCh <- object
+			}
+		}
+	}()
+
+	opts := minio.RemoveObjectsOptions{
+		GovernanceBypass: true,
+	}
+
+	for err := range client.RemoveObjects(context.Background(), bucketName, objectsCh, opts) {
+		if err.Err != nil {
+			return err.Err
+		}
+	}
+
+	return nil
 }
