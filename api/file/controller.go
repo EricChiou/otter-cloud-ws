@@ -105,3 +105,41 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 
 	return responseEntity.Empty()
 }
+
+// Remove file
+func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo RemoveFileReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, nil)
+	}
+
+	bucketName := webInput.Payload.BucketName
+	err := minio.RemoveObject(bucketName, reqVo.Prefix, reqVo.FileName)
+	if err != nil {
+		responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
+
+// RemoveFolder remove folder
+func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo RemoveFolderReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, nil)
+	}
+
+	bucketName := webInput.Payload.BucketName
+	err := minio.RemoveObjects(bucketName, reqVo.Prefix)
+	if err != nil {
+		responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}

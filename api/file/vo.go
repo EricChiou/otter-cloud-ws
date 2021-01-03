@@ -19,6 +19,17 @@ type DownloadFileReqVo struct {
 	FileName string `json:"fileName" req:"true"`
 }
 
+// RemoveFileReqVo remove file request vo
+type RemoveFileReqVo struct {
+	Prefix   string `json:"prefix" req:"false"`
+	FileName string `json:"fileName" req:"true"`
+}
+
+// RemoveFolderReqVo remove folder requet vo
+type RemoveFolderReqVo struct {
+	Prefix string `json:"prefix" req:"true"`
+}
+
 // respone vo
 
 // GetPreviewURLResVo get preview url response vo

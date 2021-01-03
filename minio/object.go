@@ -99,14 +99,14 @@ func RemoveObject(bucketName, prefix, fileName string) error {
 }
 
 // RemoveObjects removes a list of objects obtained from an input channel
-func RemoveObjects(bucketName, prefix, fileName string) error {
+func RemoveObjects(bucketName, prefix string) error {
 	objectsCh := make(chan minio.ObjectInfo)
 	go func() {
 		defer close(objectsCh)
 
 		opts := minio.ListObjectsOptions{
 			Prefix:    prefix,
-			Recursive: false,
+			Recursive: true,
 		}
 		for object := range client.ListObjects(context.Background(), bucketName, opts) {
 			if object.Err == nil {

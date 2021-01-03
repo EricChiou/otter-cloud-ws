@@ -15,4 +15,8 @@ func initFileAPI() {
 	// Post
 	post(groupName+"/upload", true, nil, controller.Upload)
 	post(groupName+"/download", true, nil, controller.Download)
+
+	// Delete
+	delete(groupName+"/remove", true, nil, controller.Remove)
+	delete(groupName+"/remove/folder", true, nil, controller.RemoveFolder)
 }
