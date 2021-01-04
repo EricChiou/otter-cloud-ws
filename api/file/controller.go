@@ -117,7 +117,9 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 	}
 
 	bucketName := webInput.Payload.BucketName
-	err := minio.RemoveObject(bucketName, reqVo.Prefix, reqVo.FileName)
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	fileName, _ := url.QueryUnescape(reqVo.FileName)
+	err := minio.RemoveObject(bucketName, prefix, fileName)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
@@ -136,7 +138,8 @@ func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.Re
 	}
 
 	bucketName := webInput.Payload.BucketName
-	err := minio.RemoveObjects(bucketName, reqVo.Prefix)
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	err := minio.RemoveObjects(bucketName, prefix)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
