@@ -1,8 +1,8 @@
 package file
 
 import (
-	"encoding/base64"
 	"errors"
+	"net/http"
 	"net/url"
 	"otter-cloud-ws/constants/api"
 	"otter-cloud-ws/interceptor"
@@ -56,8 +56,8 @@ func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.Response
 	return responseEntity.OK(ctx, nil)
 }
 
-// GetPreviewURL get object preview url
-func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.ResponseEntity {
+// GetPreview get object preview
+func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
 	// set param
@@ -75,8 +75,15 @@ func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.R
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	resVo := GetPreviewURLResVo{URL: base64.StdEncoding.EncodeToString([]byte(url.String()))}
-	return responseEntity.OK(ctx, resVo)
+	resp, err := http.Get("http://" + url.Host + url.Path + "?" + url.RawQuery)
+	if err != nil {
+		responseEntity.Error(ctx, api.ServerError, err)
+	}
+
+	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
+	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
+
+	return responseEntity.Empty()
 }
 
 // Download file

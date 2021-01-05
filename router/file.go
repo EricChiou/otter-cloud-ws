@@ -10,7 +10,7 @@ func initFileAPI() {
 
 	// Get
 	get(groupName+"/list", true, nil, controller.List)
-	get(groupName+"/preview", true, nil, controller.GetPreviewURL)
+	get(groupName+"/preview", true, nil, controller.GetPreview)
 
 	// Post
 	post(groupName+"/upload", true, nil, controller.Upload)
