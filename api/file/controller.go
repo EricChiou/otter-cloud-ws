@@ -1,6 +1,7 @@
 package file
 
 import (
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"net/url"
@@ -25,7 +26,7 @@ func (con *Controller) List(webInput interceptor.WebInput) apihandler.ResponseEn
 	// set param
 	var listReqVo ListReqVo
 	if err := paramhandler.Set(webInput.Context, &listReqVo); err != nil {
-		return responseEntity.Error(ctx, api.FormatError, nil)
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
 	prefix, _ := url.QueryUnescape(listReqVo.Prefix)
@@ -63,19 +64,19 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 	// set param
 	var reqVo GetPreviewURLReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
-		return responseEntity.Error(ctx, api.FormatError, nil)
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
 	bucketName := webInput.Payload.BucketName
 	prefix, _ := url.QueryUnescape(reqVo.Prefix)
 	fileName, _ := url.QueryUnescape(reqVo.FileName)
 
-	url, err := minio.PresignedGetObject(bucketName, prefix, fileName, time.Second*60*60*1)
+	URL, err := minio.PresignedGetObject(bucketName, prefix, fileName, time.Second*60*60*1)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	resp, err := http.Get("http://" + url.Host + url.Path + "?" + url.RawQuery)
+	resp, err := http.Get("http://" + URL.Host + URL.Path + "?" + URL.RawQuery)
 	if err != nil {
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
@@ -93,7 +94,7 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 	// set param
 	var reqVo DownloadFileReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
-		return responseEntity.Error(ctx, api.FormatError, nil)
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
 	bucketName := webInput.Payload.BucketName
@@ -120,7 +121,7 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 	// set param
 	var reqVo RemoveFileReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
-		return responseEntity.Error(ctx, api.FormatError, nil)
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
 	bucketName := webInput.Payload.BucketName
@@ -141,7 +142,7 @@ func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.Re
 	// set param
 	var reqVo RemoveFolderReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
-		return responseEntity.Error(ctx, api.FormatError, nil)
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
 	bucketName := webInput.Payload.BucketName
@@ -152,4 +153,64 @@ func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.Re
 	}
 
 	return responseEntity.OK(ctx, nil)
+}
+
+// GetShareableLink get object shareable link
+func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetShareableLinkReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	bucketName := webInput.Payload.BucketName
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	fileName, _ := url.QueryUnescape(reqVo.FileName)
+	contentType, _ := url.QueryUnescape(reqVo.ContentType)
+	expiresSeconds := time.Duration(reqVo.ExpiresSeconds) * time.Second
+
+	URL, err := minio.PresignedGetObject(bucketName, prefix, fileName, expiresSeconds)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	clientAddr, _ := url.QueryUnescape(reqVo.ClientAddr)
+	shareableLinkURL := clientAddr + "/share-link" +
+		"?fileName=" + base64.StdEncoding.EncodeToString([]byte(fileName)) +
+		"&contentType=" + base64.StdEncoding.EncodeToString([]byte(contentType)) +
+		"&url=" + base64.StdEncoding.EncodeToString([]byte("http://"+URL.Host+URL.Path+"?"+URL.RawQuery))
+
+	resVo := GetShareableLinkResVo{
+		ShareableLink: base64.StdEncoding.EncodeToString([]byte(shareableLinkURL)),
+	}
+
+	return responseEntity.OK(ctx, resVo)
+}
+
+// GetObjectByShareableLink get object shareable link
+func (con *Controller) GetObjectByShareableLink(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetObjectByShareableLinkReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	shareableLink, err := base64.StdEncoding.DecodeString(reqVo.URL)
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.ParseError, err)
+	}
+
+	resp, err := http.Get(string(shareableLink))
+	if err != nil {
+		responseEntity.Error(ctx, api.ServerError, err)
+	}
+
+	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
+	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
+
+	return responseEntity.Empty()
 }

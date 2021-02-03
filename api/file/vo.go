@@ -30,9 +30,28 @@ type RemoveFolderReqVo struct {
 	Prefix string `json:"prefix" req:"true"`
 }
 
+// GetShareableLinkReqVo get shareable link request vo
+type GetShareableLinkReqVo struct {
+	Prefix         string `json:"prefix" req:"false"`
+	FileName       string `json:"fileName" req:"true"`
+	ContentType    string `json:"contentType" req:"true"`
+	ExpiresSeconds int    `json:"expiresSeconds" req:"true"`
+	ClientAddr     string `json:"clientAddr" req:"true"`
+}
+
+// GetObjectByShareableLinkReqVo get object by shareable link request vo
+type GetObjectByShareableLinkReqVo struct {
+	URL string `json:"url" req:"true"`
+}
+
 // respone vo
 
 // GetPreviewURLResVo get preview url response vo
 type GetPreviewURLResVo struct {
 	URL string `json:"url"`
+}
+
+// GetShareableLinkResVo get shareable link request vo
+type GetShareableLinkResVo struct {
+	ShareableLink string `json:"shareableLink"`
 }

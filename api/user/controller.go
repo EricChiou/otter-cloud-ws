@@ -49,22 +49,22 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 	// set param
 	var signInReqVo SignInReqVo
 	if err := paramhandler.Set(webInput.Context, &signInReqVo); err != nil {
-		return responseEntity.Error(ctx, api.FormatError, nil)
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
 	signInBo, err := con.dao.SignIn(signInReqVo)
 	if err != nil {
-		return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
+		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password."))
 	}
 
 	// check pwd
 	if signInBo.Pwd != sha3.Encrypt(signInReqVo.Pwd) {
-		return responseEntity.Error(ctx, api.DataError, nil)
+		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password."))
 	}
 
 	// check account status
 	if signInBo.Status != string(userstatus.Active) {
-		return responseEntity.Error(ctx, api.AccInactive, nil)
+		return responseEntity.Error(ctx, api.AccInactive, errors.New("the account is inactive."))
 	}
 
 	var signInResVo SignInResVo
