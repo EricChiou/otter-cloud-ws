@@ -32,11 +32,13 @@ CREATE TABLE IF NOT EXISTS `user` (
   `name` VARCHAR(64) NOT NULL,
   `role_code` VARCHAR(32) NOT NULL DEFAULT 'normal',
   `status` VARCHAR(32) NOT NULL DEFAULT 'inactive',
+  `bucket_name` varchar(56) NOT NULL,
   `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`),
   INDEX `user_role_code_FK_idx` (`role_code` ASC) INVISIBLE,
   UNIQUE INDEX `acc_UNIQUE` (`acc` ASC) VISIBLE,
+  UNIQUE INDEX `bucket_name_UNIQUE` (`bucket_name` ASC) VISIBLE,
   CONSTRAINT `user_role_code_FK`
     FOREIGN KEY (`role_code`)
     REFERENCES `role` (`code`)
