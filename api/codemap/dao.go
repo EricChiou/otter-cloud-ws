@@ -11,9 +11,7 @@ import (
 )
 
 // Dao codemap dao
-type Dao struct {
-	gooq mysql.Gooq
-}
+type Dao struct{}
 
 // Add add codemap dao
 func (dao *Dao) Add(addReqVo AddReqVo) error {
@@ -23,7 +21,7 @@ func (dao *Dao) Add(addReqVo AddReqVo) error {
 			Values("?", "?", "?", "?", "?")
 		g.AddValues(addReqVo.Type, addReqVo.Code, addReqVo.Name, addReqVo.SortNo, addReqVo.Enable)
 
-		if _, err := dao.gooq.Exec(g.SQL.GetSQL(), g.Args...); err != nil {
+		if _, err := g.Exec(); err != nil {
 			return err
 		}
 
@@ -42,7 +40,7 @@ func (dao *Dao) Update(updateReqVo UpdateReqVo) error {
 	g.AddValues(updateReqVo.Code, updateReqVo.Name, updateReqVo.Type, updateReqVo.SortNo, updateReqVo.Enable)
 	g.AddValues(updateReqVo.ID)
 
-	_, err := dao.gooq.Exec(g.SQL.GetSQL(), g.Args...)
+	_, err := g.Exec()
 	if err != nil {
 		return err
 	}
@@ -56,7 +54,7 @@ func (dao *Dao) Delete(deleteReqVo DeleteReqVo) error {
 	g.SQL.Delete(codemappo.Table).Where(c(codemappo.ID).Eq("?"))
 	g.AddValues(deleteReqVo.ID)
 
-	_, err := dao.gooq.Exec(g.SQL.GetSQL(), g.Args...)
+	_, err := g.Exec()
 	if err != nil {
 		return err
 	}
@@ -107,20 +105,20 @@ func (dao *Dao) List(listReqVo ListReqVo) (common.PageRespVo, error) {
 
 	}
 
-	if err := dao.gooq.Query(g.SQL.GetSQL(), rowMapper, g.Args...); err != nil {
+	if err := g.Query(rowMapper); err != nil {
 		return list, err
 	}
 
-	var count mysql.Gooq
-	count.SQL.Select(f.Count("*")).From(codemappo.Table)
+	var countG mysql.Gooq
+	countG.SQL.Select(f.Count("*")).From(codemappo.Table)
 	if listReqVo.Enable == "true" {
-		count.SQL.Where(c(codemappo.Enable).Eq(true))
+		countG.SQL.Where(c(codemappo.Enable).Eq(true))
 	}
-	countRowMapper := func(row *sql.Row) error {
+	countGRowMapper := func(row *sql.Row) error {
 		return row.Scan(&(list.Total))
 	}
 
-	if err := dao.gooq.QueryRow(count.SQL.GetSQL(), countRowMapper); err != nil {
+	if err := countG.QueryRow(countGRowMapper); err != nil {
 		return list, err
 	}
 

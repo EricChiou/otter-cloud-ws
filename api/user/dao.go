@@ -17,8 +17,23 @@ import (
 )
 
 // Dao user dao
-type Dao struct {
-	gooq mysql.Gooq
+type Dao struct{}
+
+// CheckAccExisting dao
+func (dao *Dao) CheckAccExisting(acc string) (bool, error) {
+	var g mysql.Gooq
+
+	g.SQL.Select(userpo.Acc).From(userpo.Table).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(acc)
+
+	if err := g.QueryRow(func(row *sql.Row) error {
+		var acc string
+		return row.Scan(&acc)
+	}); err != nil {
+		return false, err
+	}
+
+	return true, nil
 }
 
 // SignUp dao
@@ -36,7 +51,7 @@ func (dao *Dao) SignUp(signUp SignUpReqVo) error {
 			Values("?", "?", "?", "?", "?")
 		g.AddValues(signUp.Acc, encryptPwd, signUp.Name, userstatus.Active, bucketName)
 
-		if _, err := dao.gooq.Exec(g.SQL.GetSQL(), g.Args...); err != nil {
+		if _, err := g.Exec(); err != nil {
 			return err
 		}
 
@@ -83,7 +98,7 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 	}
 
 	// check account existing
-	if err := dao.gooq.QueryRow(g.SQL.GetSQL(), rowMapper, g.Args...); err != nil {
+	if err := g.QueryRow(rowMapper); err != nil {
 		return signInBo, err
 	}
 
@@ -107,7 +122,7 @@ func (dao *Dao) Update(updateData UpdateReqVo) error {
 	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.ID).Eq("?"))
 	g.AddValues(updateData.ID)
 
-	if _, err := dao.gooq.Exec(g.SQL.GetSQL(), g.Args...); err != nil {
+	if _, err := g.Exec(); err != nil {
 		return err
 	}
 
@@ -151,7 +166,7 @@ func (dao *Dao) List(listReqVo ListReqVo) (common.PageRespVo, error) {
 		return nil
 	}
 
-	if err := dao.gooq.Query(g.SQL.GetSQL(), rowMapper, g.Args...); err != nil {
+	if err := g.Query(rowMapper); err != nil {
 		return list, err
 	}
 
@@ -166,7 +181,7 @@ func (dao *Dao) List(listReqVo ListReqVo) (common.PageRespVo, error) {
 		return row.Scan(&(list.Total))
 	}
 
-	if err := dao.gooq.QueryRow(countG.SQL.GetSQL(), countRowMapper, countG.Args...); err != nil {
+	if err := countG.QueryRow(countRowMapper); err != nil {
 		return list, err
 	}
 

@@ -13,10 +13,10 @@ func initUserAPI() {
 	get(groupName+"/list", true, nil, controller.List)
 
 	// Post
+	post(groupName+"/signUp", false, nil, controller.SignUp)
 	post(groupName+"/signIn", false, nil, controller.SignIn)
 	post(groupName, true, nil, controller.Update)
-	post(groupName+"/update/:userID", true, []acl.Code{acl.UpdateUser}, controller.UpdateByUserID)
 
 	// Put
-	put(groupName+"/signUp", false, nil, controller.SignUp)
+	put(groupName+"/:userID", true, []acl.Code{acl.UpdateUser}, controller.UpdateByUserID)
 }

@@ -5,8 +5,6 @@ import (
 
 	"otter-cloud-ws/db/mysql"
 	"otter-cloud-ws/po/roleaclpo"
-
-	"github.com/EricChiou/gooq"
 )
 
 // Code acl code type
@@ -36,12 +34,11 @@ func Load() error {
 	// reset roleACL
 	roleACL = make(map[string][]Code)
 
-	var SQL gooq.SQL
-	SQL.Select(roleaclpo.RoleCode, roleaclpo.ACLCode).From(roleaclpo.Table)
+	var g mysql.Gooq
+	g.SQL.Select(roleaclpo.RoleCode, roleaclpo.ACLCode).From(roleaclpo.Table)
 
 	var entity roleaclpo.Entity
-	gooq := mysql.Gooq{}
-	return gooq.Query(SQL.GetSQL(), func(rows *sql.Rows) error {
+	return g.Query(func(rows *sql.Rows) error {
 		for rows.Next() {
 			err := rows.Scan(&entity.RoleCode, &entity.ACLCode)
 			if err != nil {

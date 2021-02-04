@@ -29,6 +29,10 @@ func (con *Controller) SignUp(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
+	if result, err := con.dao.CheckAccExisting(signUpData.Acc); result || err == nil {
+		return responseEntity.Error(ctx, api.Duplicate, err)
+	}
+
 	err := minio.CreateUserBucket(signUpData.Acc)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
@@ -54,17 +58,17 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 
 	signInBo, err := con.dao.SignIn(signInReqVo)
 	if err != nil {
-		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password."))
+		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password"))
 	}
 
 	// check pwd
 	if signInBo.Pwd != sha3.Encrypt(signInReqVo.Pwd) {
-		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password."))
+		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password"))
 	}
 
 	// check account status
 	if signInBo.Status != string(userstatus.Active) {
-		return responseEntity.Error(ctx, api.AccInactive, errors.New("the account is inactive."))
+		return responseEntity.Error(ctx, api.AccInactive, errors.New("the account is inactive"))
 	}
 
 	var signInResVo SignInResVo

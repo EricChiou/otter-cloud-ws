@@ -19,25 +19,25 @@ func (g *Gooq) AddValues(values ...interface{}) {
 }
 
 // Exec execute sql
-func (g *Gooq) Exec(sql string, args ...interface{}) (sql.Result, error) {
+func (g *Gooq) Exec() (sql.Result, error) {
 	tx, err := DB.Begin()
 	defer tx.Commit()
 	if err != nil {
 		return nil, errors.New("db not initialized")
 	}
 
-	return tx.Exec(sql, args...)
+	return tx.Exec(g.SQL.GetSQL(), g.Args...)
 }
 
 // Query query rows
-func (g *Gooq) Query(sql string, rowMapper func(*sql.Rows) error, args ...interface{}) error {
+func (g *Gooq) Query(rowMapper func(*sql.Rows) error) error {
 	tx, err := DB.Begin()
 	defer tx.Commit()
 	if err != nil {
 		return errors.New("db not initialized")
 	}
 
-	rows, err := tx.Query(sql, args...)
+	rows, err := tx.Query(g.SQL.GetSQL(), g.Args...)
 	if err != nil {
 		return err
 	}
@@ -47,14 +47,14 @@ func (g *Gooq) Query(sql string, rowMapper func(*sql.Rows) error, args ...interf
 }
 
 // QueryRow query one row
-func (g *Gooq) QueryRow(sql string, rowMapper func(row *sql.Row) error, args ...interface{}) error {
+func (g *Gooq) QueryRow(rowMapper func(row *sql.Row) error) error {
 	tx, err := DB.Begin()
 	defer tx.Commit()
 	if err != nil {
 		return errors.New("db not initialized")
 	}
 
-	row := tx.QueryRow(sql, args...)
+	row := tx.QueryRow(g.SQL.GetSQL(), g.Args...)
 
 	return rowMapper(row)
 }
