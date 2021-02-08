@@ -10,6 +10,8 @@ import (
 	"github.com/valyala/fasthttp"
 )
 
+var mainPath string = "/otter-cloud-ws"
+
 // Init init api
 func Init() {
 	initUserAPI()
@@ -41,43 +43,43 @@ func newFHServer() *fasthttp.Server {
 }
 
 func get(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Get(path, func(ctx *httprouter.Context) {
+	httprouter.Get(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
 
 func post(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Post(path, func(ctx *httprouter.Context) {
+	httprouter.Post(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
 
 func put(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Put(path, func(ctx *httprouter.Context) {
+	httprouter.Put(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
 
 func delete(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Delete(path, func(ctx *httprouter.Context) {
+	httprouter.Delete(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
 
 func patch(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Patch(path, func(ctx *httprouter.Context) {
+	httprouter.Patch(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
 
 func head(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Head(path, func(ctx *httprouter.Context) {
+	httprouter.Head(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
 
 func options(path string, needToken bool, aclCodes []acl.Code, run func(interceptor.WebInput) apihandler.ResponseEntity) {
-	httprouter.Options(path, func(ctx *httprouter.Context) {
+	httprouter.Options(mainPath+path, func(ctx *httprouter.Context) {
 		interceptor.Set(ctx, needToken, aclCodes, run)
 	})
 }
