@@ -44,6 +44,19 @@ type GetObjectByShareableLinkReqVo struct {
 	URL string `json:"url" req:"true"`
 }
 
+// RenameFileReqVo rename file request vo
+type RenameFileReqVo struct {
+	Prefix      string `json:"prefix" req:"false"`
+	FileName    string `json:"fileName" req:"true"`
+	NewFileName string `json:"newFileName" req:"true"`
+}
+
+type MoveFilesReqVo struct {
+	Prefix       string   `json:"prefix" req:"false"`
+	TargetPrefix string   `json:"targetPrefix" req:"false"`
+	FileNames    []string `json:"fileNames" req:"true"`
+}
+
 // respone vo
 
 // GetPreviewURLResVo get preview url response vo

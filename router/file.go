@@ -18,6 +18,10 @@ func initFileAPI() {
 	post(groupName+"/upload", true, nil, controller.Upload)
 	post(groupName+"/download", true, nil, controller.Download)
 
+	// Put
+	put(groupName+"/rename", true, nil, controller.Rename)
+	put(groupName+"/move", true, nil, controller.Move)
+
 	// Delete
 	delete(groupName+"/remove", true, nil, controller.Remove)
 	delete(groupName+"/remove/folder", true, nil, controller.RemoveFolder)

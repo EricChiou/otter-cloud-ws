@@ -17,7 +17,7 @@ type Object struct {
 	LastModified time.Time `json:"lastModified"`
 }
 
-// ListObjects lists objects in a bucket.
+// ListObjects list objects under the prefix.
 func ListObjects(bucketName, prefix string) []Object {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
@@ -122,6 +122,80 @@ func RemoveObjects(bucketName, prefix string) error {
 	for err := range client.RemoveObjects(context.Background(), bucketName, objectsCh, opts) {
 		if err.Err != nil {
 			return err.Err
+		}
+	}
+
+	return nil
+}
+
+// RenameObject by use CopyObject and RemoveObject
+func RenameObject(bucketName, prefix, fileName, newFilename string) error {
+	ctx := context.Background()
+
+	// Source object
+	srcOpts := minio.CopySrcOptions{
+		Bucket: bucketName,
+		Object: prefix + fileName,
+	}
+
+	// Destination object
+	dstOpts := minio.CopyDestOptions{
+		Bucket: bucketName,
+		Object: prefix + newFilename,
+	}
+
+	if _, err := client.CopyObject(ctx, dstOpts, srcOpts); err != nil {
+		return err
+	}
+
+	rmOpts := minio.RemoveObjectOptions{
+		GovernanceBypass: true,
+	}
+
+	if err := client.RemoveObject(ctx, bucketName, prefix+fileName, rmOpts); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// StatObject check object existing by get object info
+func StatObject(bucketName, pathFilename string) (minio.ObjectInfo, error) {
+	return client.StatObject(
+		context.Background(),
+		bucketName,
+		pathFilename,
+		minio.StatObjectOptions{},
+	)
+}
+
+// MoveObject by use CopyObject and RemoveObject
+func MoveObject(bucketName, prefix, targetPrefix string, fileNames []string) error {
+	ctx := context.Background()
+
+	for _, fileName := range fileNames {
+		// Source object
+		srcOpts := minio.CopySrcOptions{
+			Bucket: bucketName,
+			Object: prefix + fileName,
+		}
+
+		// Destination object
+		dstOpts := minio.CopyDestOptions{
+			Bucket: bucketName,
+			Object: targetPrefix + fileName,
+		}
+
+		if _, err := client.CopyObject(ctx, dstOpts, srcOpts); err != nil {
+			return err
+		}
+
+		rmOpts := minio.RemoveObjectOptions{
+			GovernanceBypass: true,
+		}
+
+		if err := client.RemoveObject(ctx, bucketName, prefix+fileName, rmOpts); err != nil {
+			return err
 		}
 	}
 

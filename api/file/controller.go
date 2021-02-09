@@ -214,3 +214,51 @@ func (con *Controller) GetObjectByShareableLink(webInput interceptor.WebInput) a
 
 	return responseEntity.Empty()
 }
+
+// Rename file
+func (con *Controller) Rename(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo RenameFileReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	bucketName := webInput.Payload.BucketName
+	prefix := reqVo.Prefix
+	filename := reqVo.FileName
+	newFilename := reqVo.NewFileName
+
+	if _, err := minio.StatObject(bucketName, prefix+newFilename); err == nil {
+		return responseEntity.Error(ctx, api.Duplicate, err)
+	}
+
+	if err := minio.RenameObject(bucketName, prefix, filename, newFilename); err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
+
+// Move files
+func (con *Controller) Move(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo MoveFilesReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	bucketName := webInput.Payload.BucketName
+	prefix := reqVo.Prefix
+	targetPrefix := reqVo.TargetPrefix
+	filenames := reqVo.FileNames
+
+	if err := minio.MoveObject(bucketName, prefix, targetPrefix, filenames); err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
