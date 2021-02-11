@@ -1,6 +1,6 @@
 package roleaclpo
 
-// table name
+// Table role_acl name
 const Table string = "role_acl"
 
 // pk name
