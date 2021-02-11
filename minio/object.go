@@ -35,7 +35,7 @@ func ListObjects(bucketName, prefix string) []Object {
 	for object := range client.ListObjects(ctx, bucketName, opts) {
 		if object.Err == nil {
 			objectList = append(objectList, Object{
-				ContentType:  object.Metadata.Get("content-type"),
+				ContentType:  object.UserMetadata["content-type"],
 				Name:         object.Key,
 				Size:         object.Size,
 				LastModified: object.LastModified,
@@ -51,7 +51,9 @@ func PutObject(bucketName, prefix string, fileHeader *multipart.FileHeader) erro
 	file, _ := fileHeader.Open()
 	defer file.Close()
 
-	putObjectOptions := minio.PutObjectOptions{ContentType: fileHeader.Header.Get("content-type")}
+	putObjectOptions := minio.PutObjectOptions{
+		ContentType: fileHeader.Header.Get("content-type"),
+	}
 
 	_, err := client.PutObject(
 		context.Background(),
