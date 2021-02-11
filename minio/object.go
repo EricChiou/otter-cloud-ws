@@ -26,20 +26,16 @@ func ListObjects(bucketName, prefix string) []Object {
 		prefix = prefix[1:]
 	}
 	opts := minio.ListObjectsOptions{
-		Prefix:    prefix,
-		Recursive: false,
+		Prefix:       prefix,
+		Recursive:    false,
+		WithMetadata: true,
 	}
 
 	var objectList []Object
 	for object := range client.ListObjects(ctx, bucketName, opts) {
 		if object.Err == nil {
-			var objectInfo minio.ObjectInfo
-			if object.Size > 0 {
-				objectInfo, _ = client.StatObject(ctx, bucketName, object.Key, minio.StatObjectOptions{})
-			}
-
 			objectList = append(objectList, Object{
-				ContentType:  objectInfo.ContentType,
+				ContentType:  object.ContentType,
 				Name:         object.Key,
 				Size:         object.Size,
 				LastModified: object.LastModified,
