@@ -35,7 +35,7 @@ func ListObjects(bucketName, prefix string) []Object {
 	for object := range client.ListObjects(ctx, bucketName, opts) {
 		if object.Err == nil {
 			objectList = append(objectList, Object{
-				ContentType:  object.ContentType,
+				ContentType:  object.Metadata.Get("content-type"),
 				Name:         object.Key,
 				Size:         object.Size,
 				LastModified: object.LastModified,
