@@ -39,6 +39,9 @@ func newFHServer() *fasthttp.Server {
 		Name:               config.Get().ServerName,
 		Handler:            httprouter.FasthttpHandler(),
 		MaxRequestBodySize: 5 * 1024 * 1024 * 1024 * 1024, // 5 TB
+		ReadTimeout:        60 * 60 * 24 * 365,
+		WriteTimeout:       60 * 60 * 24 * 365,
+		IdleTimeout:        60 * 60 * 24 * 365,
 	}
 }
 
