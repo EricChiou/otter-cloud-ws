@@ -54,6 +54,7 @@ func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
+	ctx.Request.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Connection", "keep-alive")
 
 	return responseEntity.OK(ctx, nil)
@@ -83,6 +84,7 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
 
+	ctx.Request.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
 	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
@@ -111,6 +113,7 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
 
+	ctx.Request.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
 	ctx.SetBodyStream(object, int(objectInfo.Size))
@@ -213,6 +216,7 @@ func (con *Controller) GetObjectByShareableLink(webInput interceptor.WebInput) a
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
 
+	ctx.Request.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Connection", "keep-alive")
 	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
 	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))

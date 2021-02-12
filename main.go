@@ -42,7 +42,7 @@ func main() {
 	// set headers
 	router.SetHeader("Access-Control-Allow-Origin", "*")
 	router.SetHeader("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH, HEAD, OPTIONS")
-	router.SetHeader("Access-Control-Allow-Headers", "Content-Type, Authorization")
+	router.SetHeader("Access-Control-Allow-Headers", "Content-Type, Authorization, Connection")
 
 	// init api
 	router.Init()
