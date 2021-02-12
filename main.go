@@ -48,13 +48,13 @@ func main() {
 	router.Init()
 
 	// start http server
-	// if err := router.ListenAndServe(cfg.ServerPort); err != nil {
-	// 	panic(err)
-	// }
-	// start https server
-	if err := router.ListenAndServeTLS(cfg.ServerPort, cfg.SSLCertFilePath, cfg.SSLKeyFilePath); err != nil {
+	if err := router.ListenAndServe(cfg.ServerPort); err != nil {
 		panic(err)
 	}
+	// start https server
+	// if err := router.ListenAndServeTLS(cfg.ServerPort, cfg.SSLCertFilePath, cfg.SSLKeyFilePath); err != nil {
+	// 	panic(err)
+	// }
 
 	// waiting for jobqueue finished
 	jobqueue.Wait()
