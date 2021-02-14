@@ -81,6 +81,33 @@ CREATE TABLE IF NOT EXISTS `codemap` (
   UNIQUE INDEX `code_UNIQUE` (`code` ASC) VISIBLE
 );
 
+CREATE TABLE IF NOT EXISTS `shared_folder` (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `owner_acc` VARCHAR(256) NOT NULL,
+  `shared_acc` VARCHAR(256) NOT NULL,
+  `bucket_name` VARCHAR(56) NOT NULL,
+  `prefix` TEXT NOT NULL,
+  `permission` VARCHAR(32) NOT NULL DEFAULT 'read',
+  `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  `updated_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `shared_folder_owner_acc_FK`
+    FOREIGN KEY (`owner_acc`)
+    REFERENCES `user` (`acc`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `shared_folder_shared_acc_FK`
+    FOREIGN KEY (`shared_acc`)
+    REFERENCES `user` (`acc`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+  CONSTRAINT `shared_folder_bucket_name_FK`
+    FOREIGN KEY (`bucket_name`)
+    REFERENCES `user` (`bucket_name`)
+    ON DELETE CASCADE
+    ON UPDATE CASCADE,
+);
+
 INSERT INTO `role` ( `code`, `name` ) VALUES ( 'manager', '管理員' );
 INSERT INTO `role` ( `code`, `name` ) VALUES ( 'normal', '一般' );
 
