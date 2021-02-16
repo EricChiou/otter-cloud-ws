@@ -51,6 +51,7 @@ type RenameFileReqVo struct {
 	NewFileName string `json:"newFileName" req:"true"`
 }
 
+// MoveFilesReqVo move file request vo
 type MoveFilesReqVo struct {
 	Prefix       string   `json:"prefix" req:"false"`
 	TargetPrefix string   `json:"targetPrefix" req:"false"`

@@ -3,7 +3,7 @@ package roleaclpo
 // Table role_acl name
 const Table string = "role_acl"
 
-// pk name
+// PK name
 const PK string = "id"
 
 // column name

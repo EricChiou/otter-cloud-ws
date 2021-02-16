@@ -9,6 +9,7 @@ const (
 // RespStatus api response status
 type RespStatus string
 
+// response status
 const (
 	Success          RespStatus = "ok"
 	AccInactive      RespStatus = "accInactive"
@@ -22,4 +23,5 @@ const (
 	ServerError      RespStatus = "serverError"
 	MinioError       RespStatus = "minioError"
 	UnknownError     RespStatus = "unknownError"
+	PrefixError      RespStatus = "prefixError"
 )

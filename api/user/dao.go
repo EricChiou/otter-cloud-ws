@@ -106,7 +106,7 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 }
 
 // Update dao
-func (dao *Dao) Update(updateData UpdateReqVo) error {
+func (dao *Dao) Update(updateData UpdateReqVo, acc string) error {
 	var g mysql.Gooq
 
 	var conditions []gooq.Condition
@@ -119,8 +119,8 @@ func (dao *Dao) Update(updateData UpdateReqVo) error {
 		g.AddValues(sha3.Encrypt(updateData.Pwd))
 	}
 
-	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.ID).Eq("?"))
-	g.AddValues(updateData.ID)
+	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(acc)
 
 	if _, err := g.Exec(); err != nil {
 		return err
@@ -186,4 +186,22 @@ func (dao *Dao) List(listReqVo ListReqVo) (common.PageRespVo, error) {
 	}
 
 	return list, nil
+}
+
+// GetBucketName by user account
+func (dao *Dao) GetBucketName(acc string) (string, error) {
+	var g mysql.Gooq
+
+	g.SQL.Select(userpo.BucketName).From(userpo.Table).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(acc)
+
+	var bucketName string
+	err := g.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&bucketName)
+	})
+	if err != nil {
+		return "", err
+	}
+
+	return bucketName, nil
 }

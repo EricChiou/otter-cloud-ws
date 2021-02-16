@@ -18,7 +18,7 @@ type Object struct {
 }
 
 // ListObjects list objects under the prefix.
-func ListObjects(bucketName, prefix string) []Object {
+func ListObjects(bucketName, prefix string, recursive bool) []Object {
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
@@ -27,7 +27,7 @@ func ListObjects(bucketName, prefix string) []Object {
 	}
 	opts := minio.ListObjectsOptions{
 		Prefix:       prefix,
-		Recursive:    false,
+		Recursive:    recursive,
 		WithMetadata: true,
 	}
 

@@ -1,9 +1,9 @@
 package codemappo
 
-// table name
+// Table name
 const Table string = "codemap"
 
-// pk name
+// PK name
 const PK string = "id"
 
 // column name

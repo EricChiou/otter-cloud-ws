@@ -11,7 +11,6 @@ import (
 	"otter-cloud-ws/service/jwt"
 	"otter-cloud-ws/service/paramhandler"
 	"otter-cloud-ws/service/sha3"
-	"strconv"
 )
 
 // Controller user controller
@@ -73,12 +72,9 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 
 	var signInResVo SignInResVo
 	token, _ := jwt.Generate(
-		signInBo.ID,
 		signInBo.Acc,
 		signInBo.Name,
 		signInBo.RoleCode,
-		signInBo.Name,
-		signInBo.BucketName,
 	)
 	signInResVo = SignInResVo{
 		Token: token,
@@ -100,9 +96,8 @@ func (con *Controller) Update(webInput interceptor.WebInput) apihandler.Response
 	if len(updateData.Name) == 0 && len(updateData.Pwd) == 0 {
 		return responseEntity.Error(ctx, api.FormatError, errors.New("need name or pwd"))
 	}
-	updateData.ID = payload.ID
 
-	err := con.dao.Update(updateData)
+	err := con.dao.Update(updateData, payload.Acc)
 	if err != nil {
 		return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
 	}
@@ -110,8 +105,8 @@ func (con *Controller) Update(webInput interceptor.WebInput) apihandler.Response
 	return responseEntity.OK(ctx, nil)
 }
 
-// UpdateByUserID POST: /user/:userID
-func (con *Controller) UpdateByUserID(webInput interceptor.WebInput) apihandler.ResponseEntity {
+// UpdateByUserAcc POST: /user/:userID
+func (con *Controller) UpdateByUserAcc(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
 	var updateData UpdateReqVo
@@ -125,13 +120,12 @@ func (con *Controller) UpdateByUserID(webInput interceptor.WebInput) apihandler.
 	}
 
 	// check path param
-	userID, err := strconv.ParseInt(webInput.Context.PathParam("userID"), 10, 64)
-	if err != nil {
-		return responseEntity.Error(ctx, api.FormatError, errors.New("need userID"))
+	userAcc := webInput.Context.PathParam("userAcc")
+	if len(userAcc) == 0 {
+		return responseEntity.Error(ctx, api.FormatError, errors.New("need user account"))
 	}
-	updateData.ID = int(userID)
 
-	err = con.dao.Update(updateData)
+	err := con.dao.Update(updateData, userAcc)
 	if err != nil {
 		return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
 	}

@@ -1,9 +1,9 @@
 package rolepo
 
-// table name
+// Table name
 const Table string = "role"
 
-// pk name
+// PK name
 const PK string = "id"
 
 // column name

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"otter-cloud-ws/api/user"
 	"otter-cloud-ws/constants/api"
 	"otter-cloud-ws/interceptor"
 	"otter-cloud-ws/minio"
@@ -16,7 +17,8 @@ import (
 
 // Controller file controller
 type Controller struct {
-	dao Dao
+	dao     Dao
+	userDao user.Dao
 }
 
 // List get file list
@@ -29,8 +31,9 @@ func (con *Controller) List(webInput interceptor.WebInput) apihandler.ResponseEn
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(listReqVo.Prefix)
-	objectList := minio.ListObjects(webInput.Payload.BucketName, prefix)
+	objectList := minio.ListObjects(bucketName, prefix, false)
 
 	return responseEntity.OK(ctx, objectList)
 }
@@ -39,7 +42,7 @@ func (con *Controller) List(webInput interceptor.WebInput) apihandler.ResponseEn
 func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(string(ctx.FormValue("prefix")))
 	if len(prefix) > 0 && !strings.HasSuffix(prefix, "/") {
 		prefix = prefix + "/"
@@ -67,7 +70,7 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(reqVo.Prefix)
 	fileName, _ := url.QueryUnescape(reqVo.FileName)
 
@@ -97,7 +100,7 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	object, err := minio.GetObject(bucketName, reqVo.Prefix, reqVo.FileName)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
@@ -124,7 +127,7 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(reqVo.Prefix)
 	fileName, _ := url.QueryUnescape(reqVo.FileName)
 	err := minio.RemoveObject(bucketName, prefix, fileName)
@@ -145,7 +148,7 @@ func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.Re
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(reqVo.Prefix)
 	err := minio.RemoveObjects(bucketName, prefix)
 	if err != nil {
@@ -165,7 +168,7 @@ func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandle
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(reqVo.Prefix)
 	fileName, _ := url.QueryUnescape(reqVo.FileName)
 	contentType, _ := url.QueryUnescape(reqVo.ContentType)
@@ -225,7 +228,7 @@ func (con *Controller) Rename(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix := reqVo.Prefix
 	filename := reqVo.FileName
 	newFilename := reqVo.NewFileName
@@ -251,7 +254,7 @@ func (con *Controller) Move(webInput interceptor.WebInput) apihandler.ResponseEn
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	bucketName := webInput.Payload.BucketName
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix := reqVo.Prefix
 	targetPrefix := reqVo.TargetPrefix
 	filenames := reqVo.FileNames
