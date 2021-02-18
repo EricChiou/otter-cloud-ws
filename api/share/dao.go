@@ -23,6 +23,23 @@ func (dao *Dao) CheckFolder(bucketName, prefix string) error {
 	return errors.New("the folder not existing")
 }
 
+// CheckShare not duplicated
+func (dao *Dao) CheckShare(ownerAcc, sharedAcc, prefix string) error {
+	var g mysql.Gooq
+	g.SQL.
+		Select(sharedpo.ID).
+		From(sharedpo.Table).
+		Where(c(sharedpo.OwnerAcc).Eq("?")).
+		And(c(sharedpo.SharedAcc).Eq("?")).
+		And(c(sharedpo.Prefix).Eq("?"))
+	g.AddValues(ownerAcc, sharedAcc, prefix)
+
+	return g.QueryRow(func(row *sql.Row) error {
+		var id int
+		return row.Scan(&id)
+	})
+}
+
 // Add shared folder
 func (dao *Dao) Add(ownerAcc, sharedAcc, bucketName, prefix, permission string) error {
 	var g mysql.Gooq

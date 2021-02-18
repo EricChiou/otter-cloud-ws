@@ -17,6 +17,7 @@ func Init() {
 	initUserAPI()
 	initCodemapAPI()
 	initFileAPI()
+	initSharedAPI()
 }
 
 // ListenAndServe start http server
