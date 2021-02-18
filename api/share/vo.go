@@ -31,3 +31,12 @@ type GetResVo struct {
 	Prefix     string `json:"prefix"`
 	Permission string `json:"permission"`
 }
+
+// GetShareFolderResVo response vo
+type GetShareFolderResVo struct {
+	ID         int    `json:"id"`
+	SharedAcc  string `json:"sharedAcc"`
+	SharedName string `json:"sharedName"`
+	Prefix     string `json:"prefix"`
+	Permission string `json:"permission"`
+}

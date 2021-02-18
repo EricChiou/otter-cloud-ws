@@ -18,7 +18,7 @@ type Controller struct {
 	userDao user.Dao
 }
 
-// Add new shared folder
+// Add new share folder
 func (con *Controller) Add(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
@@ -51,6 +51,15 @@ func (con *Controller) Add(webInput interceptor.WebInput) apihandler.ResponseEnt
 	}
 
 	return responseEntity.OK(ctx, nil)
+}
+
+// GetShareFolder by token
+func (con *Controller) GetShareFolder(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	shareFolderList := con.dao.GetShareFolder(webInput.Payload.Acc)
+
+	return responseEntity.OK(ctx, shareFolderList)
 }
 
 // Remove shared folder

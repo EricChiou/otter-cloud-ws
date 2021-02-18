@@ -40,7 +40,7 @@ func (dao *Dao) CheckShare(ownerAcc, sharedAcc, prefix string) error {
 	})
 }
 
-// Add shared folder
+// Add share folder
 func (dao *Dao) Add(ownerAcc, sharedAcc, bucketName, prefix, permission string) error {
 	var g mysql.Gooq
 	g.SQL.
@@ -60,6 +60,42 @@ func (dao *Dao) Add(ownerAcc, sharedAcc, bucketName, prefix, permission string) 
 	}
 
 	return nil
+}
+
+// GetShareFolder by ownerAcc
+func (dao *Dao) GetShareFolder(ownerAcc string) []GetShareFolderResVo {
+	var g mysql.Gooq
+	g.SQL.
+		Select(
+			sharedpo.Table+"."+sharedpo.ID,
+			sharedpo.SharedAcc,
+			userpo.Name,
+			sharedpo.Prefix,
+			sharedpo.Permission,
+		).
+		From(sharedpo.Table).
+		Join(userpo.Table).On(c(sharedpo.SharedAcc).Eq(userpo.Acc)).
+		Where(c(sharedpo.OwnerAcc).Eq("?"))
+	g.AddValues(ownerAcc)
+
+	var shareFolderList []GetShareFolderResVo
+	g.Query(func(rows *sql.Rows) error {
+		if rows.Next() {
+			var shareFolder GetShareFolderResVo
+			rows.Scan(
+				&shareFolder.ID,
+				&shareFolder.SharedAcc,
+				&shareFolder.SharedName,
+				&shareFolder.Prefix,
+				&shareFolder.Permission,
+			)
+
+			shareFolderList = append(shareFolderList, shareFolder)
+		}
+		return nil
+	})
+
+	return shareFolderList
 }
 
 // Remove shared folder
