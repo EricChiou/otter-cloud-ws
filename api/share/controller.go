@@ -40,7 +40,7 @@ func (con *Controller) Add(webInput interceptor.WebInput) apihandler.ResponseEnt
 	}
 
 	// check share not duplicated
-	if err := con.dao.CheckShare(ownerAcc, reqVo.SharedAcc, reqVo.Prefix); err != nil {
+	if err := con.dao.CheckShare(ownerAcc, reqVo.SharedAcc, reqVo.Prefix); err == nil {
 		return responseEntity.Error(ctx, api.Duplicate, err)
 	}
 
