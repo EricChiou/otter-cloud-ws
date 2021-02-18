@@ -1,4 +1,4 @@
-package shared
+package share
 
 import (
 	"otter-cloud-ws/service/apihandler"
