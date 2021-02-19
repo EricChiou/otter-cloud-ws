@@ -83,7 +83,7 @@ func (dao *Dao) GetSharedFolder(userAcc string) []GetSharedFolderResVo {
 
 	var sharedFolderList []GetSharedFolderResVo
 	g.Query(func(rows *sql.Rows) error {
-		if rows.Next() {
+		for rows.Next() {
 			var sharedFolder GetSharedFolderResVo
 			rows.Scan(
 				&sharedFolder.ID,
@@ -116,37 +116,6 @@ func (dao *Dao) Remove(sharedID int, ownerAcc string) error {
 	}
 
 	return nil
-}
-
-// Get shared folder by user account
-func (dao *Dao) Get(sharedAcc string) []GetResVo {
-	var g mysql.Gooq
-	g.SQL.
-		Select(sharedpo.ID, sharedpo.Prefix, sharedpo.Permission, userpo.Acc, userpo.Name).
-		From(sharedpo.Table).
-		Join(userpo.Table).On(c(sharedpo.OwnerAcc).Eq(userpo.Acc)).
-		Where(c(sharedpo.SharedAcc).Eq("?"))
-	g.AddValues(sharedAcc)
-
-	var getResVos []GetResVo
-	g.Query(func(rows *sql.Rows) error {
-		if rows.Next() {
-			var getResVo GetResVo
-			if err := rows.Scan(
-				&getResVo.ID,
-				&getResVo.Prefix,
-				&getResVo.Permission,
-				&getResVo.OwnerAcc,
-				&getResVo.OwnerName,
-			); err != nil {
-				return err
-			}
-			getResVos = append(getResVos, getResVo)
-		}
-		return nil
-	})
-
-	return getResVos
 }
 
 // CheckPermission by shared id , shared acc and prefix

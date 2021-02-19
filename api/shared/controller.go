@@ -80,15 +80,6 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 	return responseEntity.OK(ctx, nil)
 }
 
-// Get shared folder
-func (con *Controller) Get(webInput interceptor.WebInput) apihandler.ResponseEntity {
-	ctx := webInput.Context.Ctx
-
-	getResVos := con.dao.Get(webInput.Payload.Acc)
-
-	return responseEntity.OK(ctx, getResVos)
-}
-
 // GetObjectList by shared id
 func (con *Controller) GetObjectList(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
