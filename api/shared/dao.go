@@ -1,4 +1,4 @@
-package share
+package shared
 
 import (
 	"database/sql"
@@ -62,40 +62,45 @@ func (dao *Dao) Add(ownerAcc, sharedAcc, bucketName, prefix, permission string) 
 	return nil
 }
 
-// GetShareFolder by ownerAcc
-func (dao *Dao) GetShareFolder(ownerAcc string) []GetShareFolderResVo {
+// GetSharedFolder by user acc
+func (dao *Dao) GetSharedFolder(userAcc string) []GetSharedFolderResVo {
 	var g mysql.Gooq
 	g.SQL.
 		Select(
 			sharedpo.Table+"."+sharedpo.ID,
+			sharedpo.OwnerAcc,
+			"owner."+userpo.Name+" as owner_name",
 			sharedpo.SharedAcc,
-			userpo.Name,
+			"shared."+userpo.Name+" as shared_name",
 			sharedpo.Prefix,
 			sharedpo.Permission,
 		).
 		From(sharedpo.Table).
-		Join(userpo.Table).On(c(sharedpo.SharedAcc).Eq(userpo.Acc)).
-		Where(c(sharedpo.OwnerAcc).Eq("?"))
-	g.AddValues(ownerAcc)
+		Join(userpo.Table).As("owner").On(c(sharedpo.OwnerAcc).Eq("owner." + userpo.Acc)).
+		Join(userpo.Table).As("shared").On(c(sharedpo.SharedAcc).Eq("shared." + userpo.Acc)).
+		Where(c(sharedpo.OwnerAcc).Eq("?")).Or(c(sharedpo.SharedAcc).Eq("?"))
+	g.AddValues(userAcc, userAcc)
 
-	var shareFolderList []GetShareFolderResVo
+	var sharedFolderList []GetSharedFolderResVo
 	g.Query(func(rows *sql.Rows) error {
 		if rows.Next() {
-			var shareFolder GetShareFolderResVo
+			var sharedFolder GetSharedFolderResVo
 			rows.Scan(
-				&shareFolder.ID,
-				&shareFolder.SharedAcc,
-				&shareFolder.SharedName,
-				&shareFolder.Prefix,
-				&shareFolder.Permission,
+				&sharedFolder.ID,
+				&sharedFolder.OwnerAcc,
+				&sharedFolder.OwnerName,
+				&sharedFolder.SharedAcc,
+				&sharedFolder.SharedName,
+				&sharedFolder.Prefix,
+				&sharedFolder.Permission,
 			)
 
-			shareFolderList = append(shareFolderList, shareFolder)
+			sharedFolderList = append(sharedFolderList, sharedFolder)
 		}
 		return nil
 	})
 
-	return shareFolderList
+	return sharedFolderList
 }
 
 // Remove shared folder

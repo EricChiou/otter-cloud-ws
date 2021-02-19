@@ -1,4 +1,4 @@
-package share
+package shared
 
 // request vo
 
@@ -32,9 +32,11 @@ type GetResVo struct {
 	Permission string `json:"permission"`
 }
 
-// GetShareFolderResVo response vo
-type GetShareFolderResVo struct {
+// GetSharedFolderResVo response vo
+type GetSharedFolderResVo struct {
 	ID         int    `json:"id"`
+	OwnerAcc   string `json:"ownerAcc"`
+	OwnerName  string `json:"ownerName"`
 	SharedAcc  string `json:"sharedAcc"`
 	SharedName string `json:"sharedName"`
 	Prefix     string `json:"prefix"`

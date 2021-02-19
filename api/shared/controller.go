@@ -1,4 +1,4 @@
-package share
+package shared
 
 import (
 	"errors"
@@ -53,16 +53,16 @@ func (con *Controller) Add(webInput interceptor.WebInput) apihandler.ResponseEnt
 	return responseEntity.OK(ctx, nil)
 }
 
-// GetShareFolder by token
-func (con *Controller) GetShareFolder(webInput interceptor.WebInput) apihandler.ResponseEntity {
+// GetSharedFolder by token
+func (con *Controller) GetSharedFolder(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
-	shareFolderList := con.dao.GetShareFolder(webInput.Payload.Acc)
+	sharedFolderList := con.dao.GetSharedFolder(webInput.Payload.Acc)
 
-	return responseEntity.OK(ctx, shareFolderList)
+	return responseEntity.OK(ctx, sharedFolderList)
 }
 
-// Remove shared folder
+// Remove share folder
 func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
