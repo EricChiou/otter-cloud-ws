@@ -136,17 +136,17 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 	var entity sharedpo.Entity
 	err := g.QueryRow(func(row *sql.Row) error {
 		return row.Scan(
-			entity.ID,
-			entity.SharedAcc,
-			entity.BucketName,
-			entity.Prefix,
-			entity.Permission,
+			&entity.ID,
+			&entity.SharedAcc,
+			&entity.BucketName,
+			&entity.Prefix,
+			&entity.Permission,
 		)
 	})
 
 	if entity.SharedAcc != sharedAcc ||
 		strings.Index(prefix, entity.Prefix) != 0 {
-		return entity, errors.New("permission denied | " + entity.SharedAcc + " | " + entity.Prefix + " | " + sharedAcc + " | " + prefix)
+		return entity, errors.New("permission denied")
 	}
 
 	return entity, err
