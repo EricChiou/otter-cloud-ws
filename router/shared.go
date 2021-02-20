@@ -11,6 +11,7 @@ func initSharedAPI() {
 
 	// Post
 	post(groupName+"/add", true, nil, controller.Add)
+	post(groupName+"/remove", true, nil, controller.Remove)
 
 	// Put
 
