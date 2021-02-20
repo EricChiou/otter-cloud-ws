@@ -10,6 +10,7 @@ import (
 	"otter-cloud-ws/service/apihandler"
 	"otter-cloud-ws/service/paramhandler"
 	"strconv"
+	"strings"
 )
 
 // Controller shared controller
@@ -99,7 +100,8 @@ func (con *Controller) GetObjectList(webInput interceptor.WebInput) apihandler.R
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
-	objectList := minio.ListObjects(sharedEntity.BucketName, prefix, false)
+	mergePrefix := sharedEntity.Prefix + strings.SplitAfterN(prefix, "/", 2)[1]
+	objectList := minio.ListObjects(sharedEntity.BucketName, mergePrefix, false)
 
 	return responseEntity.OK(ctx, objectList)
 }

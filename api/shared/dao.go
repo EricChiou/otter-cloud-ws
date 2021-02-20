@@ -95,6 +95,11 @@ func (dao *Dao) GetSharedFolder(userAcc string) []GetSharedFolderResVo {
 				&sharedFolder.Permission,
 			)
 
+			if userAcc == sharedFolder.SharedAcc {
+				perfixSep := strings.SplitAfter(sharedFolder.Prefix, "/")
+				sharedFolder.Prefix = perfixSep[len(perfixSep)-2]
+			}
+
 			sharedFolderList = append(sharedFolderList, sharedFolder)
 		}
 		return nil
@@ -144,8 +149,9 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 		)
 	})
 
+	prefixSep := strings.SplitAfter(entity.Prefix, "/")
 	if entity.SharedAcc != sharedAcc ||
-		strings.Index(prefix, entity.Prefix) != 0 {
+		prefixSep[len(prefixSep)-2] != strings.SplitAfterN(prefix, "/", 1)[0] {
 		return entity, errors.New("permission denied")
 	}
 
