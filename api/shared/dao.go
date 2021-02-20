@@ -146,7 +146,7 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 
 	if entity.SharedAcc != sharedAcc ||
 		strings.Index(prefix, entity.Prefix) != 0 {
-		return entity, errors.New("permission denied " + entity.SharedAcc + " " + entity.Prefix)
+		return entity, errors.New("permission denied " + entity.SharedAcc + " " + entity.Prefix + " " + sharedAcc + " " + prefix)
 	}
 
 	return entity, err
