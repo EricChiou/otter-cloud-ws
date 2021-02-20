@@ -96,7 +96,7 @@ func (con *Controller) GetObjectList(webInput interceptor.WebInput) apihandler.R
 	// check permission
 	sharedEntity, err := con.dao.CheckPermission(int(sharedID), webInput.Payload.Acc, prefix)
 	if err != nil {
-		return responseEntity.Error(ctx, api.PermissionDenied, nil)
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
 	objectList := minio.ListObjects(sharedEntity.BucketName, prefix, false)
