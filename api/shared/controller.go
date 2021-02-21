@@ -2,6 +2,7 @@ package shared
 
 import (
 	"errors"
+	"net/http"
 	"net/url"
 	"otter-cloud-ws/api/user"
 	"otter-cloud-ws/constants/api"
@@ -10,7 +11,7 @@ import (
 	"otter-cloud-ws/service/apihandler"
 	"otter-cloud-ws/service/paramhandler"
 	"strconv"
-	"strings"
+	"time"
 )
 
 // Controller shared controller
@@ -100,10 +101,43 @@ func (con *Controller) GetObjectList(webInput interceptor.WebInput) apihandler.R
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
-	mergePrefix := sharedEntity.Prefix + strings.SplitAfterN(prefix, "/", 2)[1]
-	objectList := minio.ListObjects(sharedEntity.BucketName, mergePrefix, false)
+	objectList := minio.ListObjects(sharedEntity.BucketName, sharedEntity.Prefix, false)
 
 	return responseEntity.OK(ctx, objectList)
+}
+
+// GetPreview get shared object preview
+func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetSharedFilePreviewURLReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	if err != nil {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	fileName, _ := url.QueryUnescape(reqVo.FileName)
+
+	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, prefix, fileName, time.Second*60*60)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	resp, err := http.Get("http://" + URL.Host + URL.Path + "?" + URL.RawQuery)
+	if err != nil {
+		responseEntity.Error(ctx, api.ServerError, err)
+	}
+
+	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
+	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
+
+	return responseEntity.Empty()
 }
 
 // Download shared file
@@ -111,7 +145,7 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 	ctx := webInput.Context.Ctx
 
 	// set param
-	var reqVo GetOSharedFileReqVo
+	var reqVo GetSharedFileReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}

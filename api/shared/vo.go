@@ -14,8 +14,15 @@ type RemoveReqVo struct {
 	ID int `json:"id" req:"true"`
 }
 
-// GetOSharedFileReqVo request vo
-type GetOSharedFileReqVo struct {
+// GetSharedFileReqVo request vo
+type GetSharedFileReqVo struct {
+	ID       int    `json:"id" req:"true"`
+	Prefix   string `json:"prefix" req:"true"`
+	FileName string `json:"fileName" req:"true"`
+}
+
+// GetSharedFilePreviewURLReqVo request vo
+type GetSharedFilePreviewURLReqVo struct {
 	ID       int    `json:"id" req:"true"`
 	Prefix   string `json:"prefix" req:"true"`
 	FileName string `json:"fileName" req:"true"`
