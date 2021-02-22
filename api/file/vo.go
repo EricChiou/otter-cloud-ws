@@ -36,7 +36,7 @@ type GetShareableLinkReqVo struct {
 	FileName       string `json:"fileName" req:"true"`
 	ContentType    string `json:"contentType" req:"true"`
 	ExpiresSeconds int    `json:"expiresSeconds" req:"true"`
-	ClientAddr     string `json:"clientAddr" req:"true"`
+	ClientURL      string `json:"clientUrl" req:"true"`
 }
 
 // GetObjectByShareableLinkReqVo get object by shareable link request vo

@@ -1,7 +1,6 @@
 package file
 
 import (
-	"encoding/base64"
 	"errors"
 	"net/http"
 	"net/url"
@@ -169,24 +168,20 @@ func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandle
 	}
 
 	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
-	prefix, _ := url.QueryUnescape(reqVo.Prefix)
-	fileName, _ := url.QueryUnescape(reqVo.FileName)
-	contentType, _ := url.QueryUnescape(reqVo.ContentType)
 	expiresSeconds := time.Duration(reqVo.ExpiresSeconds) * time.Second
 
-	URL, err := minio.PresignedGetObject(bucketName, prefix, fileName, expiresSeconds)
+	URL, err := minio.PresignedGetObject(bucketName, reqVo.Prefix, reqVo.FileName, expiresSeconds)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	clientAddr, _ := url.QueryUnescape(reqVo.ClientAddr)
-	shareableLinkURL := clientAddr + "/share-link" +
-		"?fileName=" + base64.StdEncoding.EncodeToString([]byte(fileName)) +
-		"&contentType=" + base64.StdEncoding.EncodeToString([]byte(contentType)) +
-		"&url=" + base64.StdEncoding.EncodeToString([]byte("http://"+URL.Host+URL.Path+"?"+URL.RawQuery))
+	shareableLinkURL := reqVo.ClientURL +
+		"?fileName=" + url.QueryEscape(reqVo.FileName) +
+		"&contentType=" + url.QueryEscape(reqVo.ContentType) +
+		"&url=" + url.QueryEscape("http://"+URL.Host+URL.Path+"?"+URL.RawQuery)
 
 	resVo := GetShareableLinkResVo{
-		ShareableLink: base64.StdEncoding.EncodeToString([]byte(shareableLinkURL)),
+		ShareableLink: shareableLinkURL,
 	}
 
 	return responseEntity.OK(ctx, resVo)
@@ -202,7 +197,7 @@ func (con *Controller) GetObjectByShareableLink(webInput interceptor.WebInput) a
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	shareableLink, err := base64.StdEncoding.DecodeString(reqVo.URL)
+	shareableLink, err := url.QueryUnescape(reqVo.URL)
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
 		return responseEntity.Error(ctx, api.ParseError, err)
 	}

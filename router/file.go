@@ -11,12 +11,12 @@ func initFileAPI() {
 	// Get
 	get(groupName+"/list", true, nil, controller.List)
 	get(groupName+"/preview", true, nil, controller.GetPreview)
-	get(groupName+"/shareableLink", true, nil, controller.GetShareableLink)
-	get(groupName+"/object/shareableLink", false, nil, controller.GetObjectByShareableLink)
 
 	// Post
 	post(groupName+"/upload", true, nil, controller.Upload)
 	post(groupName+"/download", true, nil, controller.Download)
+	post(groupName+"/shareableLink", true, nil, controller.GetShareableLink)
+	post(groupName+"/shareableLink/object", false, nil, controller.GetObjectByShareableLink)
 
 	// Put
 	put(groupName+"/rename", true, nil, controller.Rename)
