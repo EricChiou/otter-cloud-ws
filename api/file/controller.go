@@ -193,12 +193,7 @@ func (con *Controller) GetObjectByShareableLink(webInput interceptor.WebInput) a
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	shareableLink, err := url.QueryUnescape(reqVo.URL)
-	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
-		return responseEntity.Error(ctx, api.ParseError, err)
-	}
-
-	resp, err := http.Get(string(shareableLink))
+	resp, err := http.Get(reqVo.URL)
 	if err != nil {
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
