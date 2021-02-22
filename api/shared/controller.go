@@ -144,18 +144,13 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	sharedID := reqVo.ID
-	prefix, _ := url.QueryUnescape(reqVo.Prefix)
-	fileName, _ := url.QueryUnescape(reqVo.FileName)
-
 	// check permission
-	sharedEntity, err := con.dao.CheckPermission(int(sharedID), webInput.Payload.Acc, prefix)
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
 	if err != nil {
 		return responseEntity.Error(ctx, api.PermissionDenied, nil)
 	}
 
-	bucketName := sharedEntity.BucketName
-	object, err := minio.GetObject(bucketName, sharedEntity.Prefix, fileName)
+	object, err := minio.GetObject(sharedEntity.BucketName, sharedEntity.Prefix, reqVo.FileName)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
