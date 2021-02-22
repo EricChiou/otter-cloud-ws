@@ -176,7 +176,7 @@ func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandle
 	}
 
 	resVo := GetShareableLinkResVo{
-		ShareableLink: URL.String(),
+		ShareableLink: url.QueryEscape(URL.String()),
 	}
 
 	return responseEntity.OK(ctx, resVo)
