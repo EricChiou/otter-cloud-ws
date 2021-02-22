@@ -8,7 +8,7 @@ func initSharedAPI() {
 
 	// Get
 	get(groupName+"/folder", true, nil, controller.GetSharedFolder)
-	get(groupName+"/file/list/:id/:prefix", true, nil, controller.GetObjectList)
+	get(groupName+"/file/list", true, nil, controller.GetObjectList)
 
 	// Post
 	post(groupName+"/add", true, nil, controller.Add)

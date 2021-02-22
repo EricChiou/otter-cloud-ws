@@ -1,7 +1,6 @@
 package shared
 
 import (
-	"errors"
 	"net/http"
 	"net/url"
 	"otter-cloud-ws/api/user"
@@ -10,7 +9,6 @@ import (
 	"otter-cloud-ws/minio"
 	"otter-cloud-ws/service/apihandler"
 	"otter-cloud-ws/service/paramhandler"
-	"strconv"
 	"time"
 )
 
@@ -86,17 +84,16 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 func (con *Controller) GetObjectList(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
-	sharedID, err := strconv.ParseInt(webInput.Context.PathParam("id"), 10, 64)
-	if err != nil {
-		return responseEntity.Error(ctx, api.FormatError, errors.New("need shared id"))
-	}
-	prefix, err := url.QueryUnescape(webInput.Context.PathParam("prefix"))
-	if err != nil {
-		return responseEntity.Error(ctx, api.FormatError, errors.New("need prefix"))
+	// set param
+	var fileListReqVo GetSharedFileListReqVo
+	if err := paramhandler.Set(webInput.Context, &fileListReqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
+	prefix, _ := url.QueryUnescape(fileListReqVo.Prefix)
+
 	// check permission
-	sharedEntity, err := con.dao.CheckPermission(int(sharedID), webInput.Payload.Acc, prefix)
+	sharedEntity, err := con.dao.CheckPermission(fileListReqVo.ID, webInput.Payload.Acc, prefix)
 	if err != nil {
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
