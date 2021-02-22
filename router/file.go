@@ -10,11 +10,11 @@ func initFileAPI() {
 
 	// Get
 	get(groupName+"/list", true, nil, controller.List)
-	get(groupName+"/preview", true, nil, controller.GetPreview)
 
 	// Post
 	post(groupName+"/upload", true, nil, controller.Upload)
 	post(groupName+"/download", true, nil, controller.Download)
+	post(groupName+"/preview", true, nil, controller.GetPreview)
 	post(groupName+"/shareableLink", true, nil, controller.GetShareableLink)
 	post(groupName+"/shareableLink/object", false, nil, controller.GetObjectByShareableLink)
 

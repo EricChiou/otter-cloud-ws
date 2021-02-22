@@ -121,15 +121,12 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
-	prefix, _ := url.QueryUnescape(reqVo.Prefix)
-	fileName, _ := url.QueryUnescape(reqVo.FileName)
-
-	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, prefix, fileName, time.Second*60*60)
+	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, reqVo.Prefix, reqVo.FileName, time.Second*60*60)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	resp, err := http.Get("http://" + URL.Host + URL.Path + "?" + URL.RawQuery)
+	resp, err := http.Get(URL.String())
 	if err != nil {
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
