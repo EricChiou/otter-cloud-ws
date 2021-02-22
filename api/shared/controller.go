@@ -1,6 +1,7 @@
 package shared
 
 import (
+	"encoding/base64"
 	"net/http"
 	"net/url"
 	"otter-cloud-ws/api/user"
@@ -164,4 +165,34 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 	ctx.SetBodyStream(object, int(objectInfo.Size))
 
 	return responseEntity.Empty()
+}
+
+// GetShareableLink get object shareable link
+func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetShareableLinkReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	// check permission
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	if err != nil {
+		return responseEntity.Error(ctx, api.PermissionDenied, nil)
+	}
+
+	expiresSeconds := time.Duration(reqVo.ExpiresSeconds) * time.Second
+
+	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, sharedEntity.Prefix, reqVo.FileName, expiresSeconds)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	resVo := GetShareableLinkResVo{
+		ShareableLink: base64.StdEncoding.EncodeToString([]byte(URL.String())),
+	}
+
+	return responseEntity.OK(ctx, resVo)
 }
