@@ -175,13 +175,8 @@ func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandle
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	shareableLinkURL := reqVo.ClientURL +
-		"?fileName=" + url.QueryEscape(reqVo.FileName) +
-		"&contentType=" + url.QueryEscape(reqVo.ContentType) +
-		"&url=" + url.QueryEscape("http://"+URL.Host+URL.Path+"?"+URL.RawQuery)
-
 	resVo := GetShareableLinkResVo{
-		ShareableLink: shareableLinkURL,
+		ShareableLink: URL.String(),
 	}
 
 	return responseEntity.OK(ctx, resVo)
