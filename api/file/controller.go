@@ -1,6 +1,7 @@
 package file
 
 import (
+	"encoding/base64"
 	"errors"
 	"net/http"
 	"net/url"
@@ -176,7 +177,7 @@ func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandle
 	}
 
 	resVo := GetShareableLinkResVo{
-		ShareableLink: url.PathEscape(URL.String()),
+		ShareableLink: base64.StdEncoding.EncodeToString([]byte(URL.String())),
 	}
 
 	return responseEntity.OK(ctx, resVo)
