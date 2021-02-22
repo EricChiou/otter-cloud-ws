@@ -118,7 +118,7 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
-	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, reqVo.Prefix, reqVo.FileName, time.Second*60*60)
+	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, sharedEntity.Prefix, reqVo.FileName, time.Second*60*60)
 	if err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
@@ -155,7 +155,7 @@ func (con *Controller) Download(webInput interceptor.WebInput) apihandler.Respon
 	}
 
 	bucketName := sharedEntity.BucketName
-	object, err := minio.GetObject(bucketName, prefix, fileName)
+	object, err := minio.GetObject(bucketName, sharedEntity.Prefix, fileName)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
