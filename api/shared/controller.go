@@ -12,6 +12,8 @@ import (
 	"otter-cloud-ws/minio"
 	"otter-cloud-ws/service/apihandler"
 	"otter-cloud-ws/service/paramhandler"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -87,16 +89,21 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 func (con *Controller) UploadObject(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
-	// set param
-	var reqVo UploadObjectReqVo
-	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+	id, err := strconv.ParseInt(string(ctx.FormValue("id")), 10, 64)
+	if err != nil || id == 0 {
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	prefix, err := url.QueryUnescape(string(ctx.FormValue("prefix")))
+	if err != nil || len(prefix) == 0 {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+	if len(prefix) > 0 && !strings.HasSuffix(prefix, "/") {
+		prefix = prefix + "/"
+	}
 
 	// check permission
-	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, prefix)
+	sharedEntity, err := con.dao.CheckPermission(int(id), webInput.Payload.Acc, prefix)
 	if err != nil || sharedEntity.Permission != sharedperms.Write {
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
