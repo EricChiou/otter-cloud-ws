@@ -37,9 +37,22 @@ type GetSharedFilePreviewURLReqVo struct {
 // GetShareableLinkReqVo request vo
 type GetShareableLinkReqVo struct {
 	ID             int    `json:"id" req:"true"`
-	Prefix         string `json:"prefix" req:"false"`
+	Prefix         string `json:"prefix" req:"true"`
 	FileName       string `json:"fileName" req:"true"`
 	ExpiresSeconds int    `json:"expiresSeconds" req:"true"`
+}
+
+// RemoveObjectReqVo request vo
+type RemoveObjectReqVo struct {
+	ID       int    `json:"id" req:"true"`
+	Prefix   string `json:"prefix" req:"true"`
+	FileName string `json:"fileName" req:"true"`
+}
+
+// UploadObjectReqVo request vo
+type UploadObjectReqVo struct {
+	ID     int    `json:"id" req:"true"`
+	Prefix string `json:"prefix" req:"true"`
 }
 
 // response vo

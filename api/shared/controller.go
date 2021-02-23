@@ -2,10 +2,12 @@ package shared
 
 import (
 	"encoding/base64"
+	"errors"
 	"net/http"
 	"net/url"
 	"otter-cloud-ws/api/user"
 	"otter-cloud-ws/constants/api"
+	"otter-cloud-ws/constants/sharedperms"
 	"otter-cloud-ws/interceptor"
 	"otter-cloud-ws/minio"
 	"otter-cloud-ws/service/apihandler"
@@ -76,6 +78,60 @@ func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.Response
 	err := con.dao.Remove(reqVo.ID, webInput.Payload.Acc)
 	if err != nil {
 		return responseEntity.Error(ctx, api.DBError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
+
+// UploadObject by shared id, prefix, fileName and token
+func (con *Controller) UploadObject(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo UploadObjectReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+
+	// check permission
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, prefix)
+	if err != nil || sharedEntity.Permission != sharedperms.Write {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	fileHeader, _ := ctx.FormFile("file")
+	if fileHeader == nil {
+		return responseEntity.Error(ctx, api.FormatError, errors.New("need formData which key is 'file'"))
+	}
+
+	if err := minio.PutObject(sharedEntity.BucketName, sharedEntity.Prefix, fileHeader); err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
+
+// RemoveObject by shared id, prefix, fileName and token
+func (con *Controller) RemoveObject(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo RemoveObjectReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	// check permission
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	if err != nil || sharedEntity.Permission != sharedperms.Write {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	err = minio.RemoveObject(sharedEntity.BucketName, sharedEntity.Prefix, reqVo.FileName)
+	if err != nil {
+		responseEntity.Error(ctx, api.MinioError, err)
 	}
 
 	return responseEntity.OK(ctx, nil)

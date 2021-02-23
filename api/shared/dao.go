@@ -139,7 +139,7 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 	g.AddValues(sharedID)
 
 	var entity sharedpo.Entity
-	err := g.QueryRow(func(row *sql.Row) error {
+	if err := g.QueryRow(func(row *sql.Row) error {
 		return row.Scan(
 			&entity.ID,
 			&entity.SharedAcc,
@@ -147,7 +147,9 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 			&entity.Prefix,
 			&entity.Permission,
 		)
-	})
+	}); err != nil {
+		return entity, err
+	}
 
 	entityPrefixSep := strings.SplitAfter(entity.Prefix, "/")
 	prefixSep := strings.SplitAfterN(prefix, "/", 2)
@@ -157,7 +159,7 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 
 	entity.Prefix = entity.Prefix + prefixSep[1]
 
-	return entity, err
+	return entity, nil
 }
 
 // CheckWritePermission by shared id , shared acc and prefix
