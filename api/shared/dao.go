@@ -154,7 +154,7 @@ func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedp
 	entityPrefixSep := strings.SplitAfter(entity.Prefix, "/")
 	prefixSep := strings.SplitAfterN(prefix, "/", 2)
 	if entity.SharedAcc != sharedAcc || entityPrefixSep[len(entityPrefixSep)-2] != prefixSep[0] {
-		return entity, errors.New(entityPrefixSep[len(entityPrefixSep)-2] + " " + prefixSep[0])
+		return entity, errors.New("permission denied")
 	}
 
 	entity.Prefix = entity.Prefix + prefixSep[1]

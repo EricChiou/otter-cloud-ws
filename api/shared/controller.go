@@ -123,13 +123,16 @@ func (con *Controller) RemoveObject(webInput interceptor.WebInput) apihandler.Re
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+	fileName, _ := url.QueryUnescape(reqVo.FileName)
+
 	// check permission
-	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, prefix)
 	if err != nil || sharedEntity.Permission != sharedperms.Write {
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
-	err = minio.RemoveObject(sharedEntity.BucketName, sharedEntity.Prefix, reqVo.FileName)
+	err = minio.RemoveObject(sharedEntity.BucketName, sharedEntity.Prefix, fileName)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
