@@ -22,4 +22,5 @@ func initSharedAPI() {
 
 	// Delete
 	delete(groupName+"/file", true, nil, controller.RemoveObject)
+	delete(groupName+"/folder", true, nil, controller.RemoveFolder)
 }

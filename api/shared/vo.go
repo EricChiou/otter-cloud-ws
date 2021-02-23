@@ -55,6 +55,12 @@ type UploadObjectReqVo struct {
 	Prefix string `json:"prefix" req:"true"`
 }
 
+// RemoveFolderReqVo request vo
+type RemoveFolderReqVo struct {
+	ID     int    `json:"id" req:"true"`
+	Prefix string `json:"prefix" req:"true"`
+}
+
 // response vo
 
 // GetResVo response vo

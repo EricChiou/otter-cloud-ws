@@ -147,6 +147,32 @@ func (con *Controller) RemoveObject(webInput interceptor.WebInput) apihandler.Re
 	return responseEntity.OK(ctx, nil)
 }
 
+// RemoveFolder remove folder
+func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo RemoveFolderReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	prefix, _ := url.QueryUnescape(reqVo.Prefix)
+
+	// check permission
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, prefix)
+	if err != nil || sharedEntity.Permission != sharedperms.Write {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	err = minio.RemoveObjects(sharedEntity.BucketName, sharedEntity.Prefix)
+	if err != nil {
+		responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
+
 // GetObjectList by shared id
 func (con *Controller) GetObjectList(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
