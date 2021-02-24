@@ -61,6 +61,14 @@ type RemoveFolderReqVo struct {
 	Prefix string `json:"prefix" req:"true"`
 }
 
+// RenameSharedFileReqVo request
+type RenameSharedFileReqVo struct {
+	ID          int    `json:"id" req:"true"`
+	Prefix      string `json:"prefix" req:"true"`
+	FileName    string `json:"fileName" req:"true"`
+	NewFileName string `json:"newFileName" req:"true"`
+}
+
 // response vo
 
 // GetResVo response vo

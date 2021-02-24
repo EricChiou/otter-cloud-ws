@@ -19,6 +19,7 @@ func initSharedAPI() {
 	post(groupName+"/file/upload", true, nil, controller.UploadObject)
 
 	// Put
+	put(groupName+"/file/rename", true, nil, controller.Rename)
 
 	// Delete
 	delete(groupName+"/file", true, nil, controller.RemoveObject)

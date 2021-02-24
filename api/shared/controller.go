@@ -288,3 +288,35 @@ func (con *Controller) GetShareableLink(webInput interceptor.WebInput) apihandle
 
 	return responseEntity.OK(ctx, resVo)
 }
+
+// Rename shared file
+func (con *Controller) Rename(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo RenameSharedFileReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	// check permission
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	if err != nil || sharedEntity.Permission != sharedperms.Write {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	if _, err := minio.StatObject(sharedEntity.BucketName, sharedEntity.Prefix+reqVo.NewFileName); err == nil {
+		return responseEntity.Error(ctx, api.Duplicate, err)
+	}
+
+	if err := minio.RenameObject(
+		sharedEntity.BucketName,
+		sharedEntity.Prefix,
+		reqVo.FileName,
+		reqVo.NewFileName,
+	); err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
