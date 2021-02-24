@@ -170,7 +170,10 @@ func (con *Controller) GetUserFuzzyList(webInput interceptor.WebInput) apihandle
 	}
 
 	keyword, _ := url.QueryUnescape(reqVo.Keyword)
-	accountList := con.dao.GetUserFuzzyList(keyword)
+	accountList, err := con.dao.GetUserFuzzyList(keyword)
+	if err != nil {
+		return responseEntity.Error(ctx, api.DBError, err)
+	}
 
 	return responseEntity.OK(ctx, accountList)
 }
