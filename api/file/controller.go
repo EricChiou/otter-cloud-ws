@@ -242,9 +242,14 @@ func (con *Controller) Move(webInput interceptor.WebInput) apihandler.ResponseEn
 
 	targetFiles := minio.ListObjects(bucketName, reqVo.TargetPrefix, false)
 	for _, targetFile := range targetFiles {
-		for _, sourceFileName := range reqVo.FileNames {
-			if sourceFileName == targetFile.Name {
-				return responseEntity.Error(ctx, api.Duplicate, nil)
+		if targetFile.Size > 0 && len(targetFile.ContentType) > 0 {
+			targetFileNameSep := strings.SplitAfter(targetFile.Name, "/")
+			targetFileName := targetFileNameSep[len(targetFileNameSep)-1]
+
+			for _, sourceFileName := range reqVo.FileNames {
+				if sourceFileName == targetFileName {
+					return responseEntity.Error(ctx, api.Duplicate, nil)
+				}
 			}
 		}
 	}
