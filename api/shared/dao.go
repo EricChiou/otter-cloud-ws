@@ -139,6 +139,21 @@ func (dao *Dao) Remove(sharedID int, ownerAcc string) error {
 	return nil
 }
 
+// RemoveByPrefix shared folder by prefix
+func (dao *Dao) RemoveByPrefix(prefix, ownerAcc string) error {
+	var g mysql.Gooq
+	g.SQL.
+		Delete(sharedpo.Table).
+		Where(c(sharedpo.Prefix).Eq("?")).And(c(sharedpo.OwnerAcc).Eq("?"))
+	g.AddValues(prefix, ownerAcc)
+
+	if _, err := g.Exec(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
 // CheckPermission by shared id , shared acc and prefix
 func (dao *Dao) CheckPermission(sharedID int, sharedAcc, prefix string) (sharedpo.Entity, error) {
 	var g mysql.Gooq

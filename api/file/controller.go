@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/url"
+	"otter-cloud-ws/api/shared"
 	"otter-cloud-ws/api/user"
 	"otter-cloud-ws/constants/api"
 	"otter-cloud-ws/interceptor"
@@ -17,8 +18,9 @@ import (
 
 // Controller file controller
 type Controller struct {
-	dao     Dao
-	userDao user.Dao
+	dao       Dao
+	userDao   user.Dao
+	sharedDao shared.Dao
 }
 
 // List get file list
@@ -148,7 +150,13 @@ func (con *Controller) RemoveFolder(webInput interceptor.WebInput) apihandler.Re
 
 	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
 	prefix, _ := url.QueryUnescape(reqVo.Prefix)
-	err := minio.RemoveObjects(bucketName, prefix)
+
+	err := con.sharedDao.RemoveByPrefix(prefix, webInput.Payload.Acc)
+	if err != nil {
+		responseEntity.Error(ctx, api.DBError, err)
+	}
+
+	err = minio.RemoveObjects(bucketName, prefix)
 	if err != nil {
 		responseEntity.Error(ctx, api.MinioError, err)
 	}
