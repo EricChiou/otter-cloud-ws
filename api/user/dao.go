@@ -213,9 +213,7 @@ func (dao *Dao) GetUserFuzzyList(keyword string) []string {
 	g.SQL.
 		Select(userpo.Acc).
 		From(userpo.Table).
-		Where(c(userpo.Acc).Like("?"))
-
-	g.AddValues(keyword + "%")
+		Where(c(userpo.Acc).Like(keyword + "%"))
 
 	var accountList []string
 	g.Query(func(rows *sql.Rows) error {
