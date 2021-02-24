@@ -343,6 +343,15 @@ func (con *Controller) Move(webInput interceptor.WebInput) apihandler.ResponseEn
 		return responseEntity.Error(ctx, api.PermissionDenied, err)
 	}
 
+	targetFiles := minio.ListObjects(sourceSharedEnt.BucketName, targetSharedEnt.Prefix, false)
+	for _, targetFile := range targetFiles {
+		for _, sourceFileName := range reqVo.FileNames {
+			if sourceFileName == targetFile.Name {
+				return responseEntity.Error(ctx, api.Duplicate, nil)
+			}
+		}
+	}
+
 	if err := minio.MoveObject(
 		sourceSharedEnt.BucketName,
 		sourceSharedEnt.Prefix,

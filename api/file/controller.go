@@ -239,11 +239,17 @@ func (con *Controller) Move(webInput interceptor.WebInput) apihandler.ResponseEn
 	}
 
 	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
-	prefix := reqVo.Prefix
-	targetPrefix := reqVo.TargetPrefix
-	filenames := reqVo.FileNames
 
-	if err := minio.MoveObject(bucketName, prefix, targetPrefix, filenames); err != nil {
+	targetFiles := minio.ListObjects(bucketName, reqVo.TargetPrefix, false)
+	for _, targetFile := range targetFiles {
+		for _, sourceFileName := range reqVo.FileNames {
+			if sourceFileName == targetFile.Name {
+				return responseEntity.Error(ctx, api.Duplicate, nil)
+			}
+		}
+	}
+
+	if err := minio.MoveObject(bucketName, reqVo.Prefix, reqVo.TargetPrefix, reqVo.FileNames); err != nil {
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
