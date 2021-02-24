@@ -2,6 +2,7 @@ package user
 
 import (
 	"errors"
+	"net/url"
 	"otter-cloud-ws/constants/api"
 	"otter-cloud-ws/constants/userstatus"
 	"otter-cloud-ws/db/mysql"
@@ -156,4 +157,20 @@ func (con *Controller) List(webInput interceptor.WebInput) apihandler.ResponseEn
 	}
 
 	return responseEntity.Page(ctx, list, api.Success, nil)
+}
+
+// GetUserFuzzyList by key word
+func (con *Controller) GetUserFuzzyList(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// check body format
+	var reqVo FuzzyListReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	keyword, _ := url.QueryUnescape(reqVo.Keyword)
+	accountList := con.dao.GetUserFuzzyList(keyword)
+
+	return responseEntity.OK(ctx, accountList)
 }

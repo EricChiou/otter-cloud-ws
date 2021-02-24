@@ -205,3 +205,28 @@ func (dao *Dao) GetBucketName(acc string) (string, error) {
 
 	return bucketName, nil
 }
+
+// GetUserFuzzyList by keyword
+func (dao *Dao) GetUserFuzzyList(keyword string) []string {
+	var g mysql.Gooq
+
+	g.SQL.
+		Select(userpo.Acc).
+		From(userpo.Table).
+		Where(c(userpo.Acc).Like("?"))
+
+	g.AddValues(keyword)
+
+	var accountList []string
+	g.Query(func(rows *sql.Rows) error {
+		for rows.Next() {
+			var account string
+			if err := rows.Scan(&account); err == nil {
+				accountList = append(accountList, account)
+			}
+		}
+		return nil
+	})
+
+	return accountList
+}

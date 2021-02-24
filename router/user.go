@@ -11,6 +11,7 @@ func initUserAPI() {
 
 	// user list
 	get(groupName+"/list", true, nil, controller.List)
+	get(groupName+"/fuzzy/list", true, nil, controller.GetUserFuzzyList)
 
 	// Post
 	post(groupName+"/signUp", false, nil, controller.SignUp)
