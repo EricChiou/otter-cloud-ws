@@ -69,6 +69,14 @@ type RenameSharedFileReqVo struct {
 	NewFileName string `json:"newFileName" req:"true"`
 }
 
+// MoveSharedFilesReqVo move file request vo
+type MoveSharedFilesReqVo struct {
+	ID           int      `json:"id" req:"true"`
+	Prefix       string   `json:"prefix" req:"false"`
+	TargetPrefix string   `json:"targetPrefix" req:"false"`
+	FileNames    []string `json:"fileNames" req:"true"`
+}
+
 // response vo
 
 // GetResVo response vo

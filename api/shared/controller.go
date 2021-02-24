@@ -320,3 +320,37 @@ func (con *Controller) Rename(webInput interceptor.WebInput) apihandler.Response
 
 	return responseEntity.OK(ctx, nil)
 }
+
+// Move shared files
+func (con *Controller) Move(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo MoveSharedFilesReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	// check sourcePrefix permission
+	sourceSharedEnt, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	if err != nil || sourceSharedEnt.Permission != sharedperms.Write {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	// check targetPrefix permission
+	targetSharedEnt, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.TargetPrefix)
+	if err != nil || targetSharedEnt.Permission != sharedperms.Write {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	if err := minio.MoveObject(
+		sourceSharedEnt.BucketName,
+		sourceSharedEnt.Prefix,
+		targetSharedEnt.Prefix,
+		reqVo.FileNames,
+	); err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
