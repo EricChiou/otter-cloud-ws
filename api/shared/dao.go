@@ -109,6 +109,22 @@ func (dao *Dao) GetSharedFolder(userAcc string) []GetSharedFolderResVo {
 }
 
 // Remove shared folder
+func (dao *Dao) Update(sharedID int, ownerAcc string, permission string) error {
+	var g mysql.Gooq
+	g.SQL.
+		Update(sharedpo.Table).
+		Set(c(sharedpo.Permission).Eq("?")).
+		Where(c(sharedpo.ID).Eq("?")).And(c(sharedpo.OwnerAcc).Eq("?"))
+	g.AddValues(permission, sharedID, ownerAcc)
+
+	if _, err := g.Exec(); err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// Remove shared folder
 func (dao *Dao) Remove(sharedID int, ownerAcc string) error {
 	var g mysql.Gooq
 	g.SQL.

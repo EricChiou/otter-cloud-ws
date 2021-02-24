@@ -9,6 +9,12 @@ type AddReqVo struct {
 	Permission string `json:"permission" req:"true"`
 }
 
+// UpdateReqVo request vo
+type UpdateReqVo struct {
+	ID         int    `json:"id" req:"true"`
+	Permission string `json:"permission" req:"true"`
+}
+
 // RemoveReqVo request vo
 type RemoveReqVo struct {
 	ID int `json:"id" req:"true"`

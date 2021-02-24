@@ -67,6 +67,24 @@ func (con *Controller) GetSharedFolder(webInput interceptor.WebInput) apihandler
 	return responseEntity.OK(ctx, sharedFolderList)
 }
 
+// Update share folder
+func (con *Controller) Update(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo UpdateReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	err := con.dao.Update(reqVo.ID, webInput.Payload.Acc, reqVo.Permission)
+	if err != nil {
+		return responseEntity.Error(ctx, api.DBError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
+
 // Remove share folder
 func (con *Controller) Remove(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
