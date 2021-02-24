@@ -108,7 +108,7 @@ func (dao *Dao) GetSharedFolder(userAcc string) []GetSharedFolderResVo {
 	return sharedFolderList
 }
 
-// Remove shared folder
+// Update shared folder
 func (dao *Dao) Update(sharedID int, ownerAcc string, permission string) error {
 	var g mysql.Gooq
 	g.SQL.

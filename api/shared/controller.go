@@ -33,8 +33,11 @@ func (con *Controller) Add(webInput interceptor.WebInput) apihandler.ResponseEnt
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
+	if reqVo.SharedAcc == webInput.Payload.Acc {
+		return responseEntity.Error(ctx, api.DataError, errors.New("can not share the folder to yourself"))
+	}
+
 	bucketName, err := con.userDao.GetBucketName(webInput.Payload.Acc)
-	ownerAcc := webInput.Payload.Acc
 	if err != nil {
 		return responseEntity.Error(ctx, api.DBError, err)
 	}
@@ -45,12 +48,12 @@ func (con *Controller) Add(webInput interceptor.WebInput) apihandler.ResponseEnt
 	}
 
 	// check share not duplicated
-	if err := con.dao.CheckShare(ownerAcc, reqVo.SharedAcc, reqVo.Prefix); err == nil {
+	if err := con.dao.CheckShare(webInput.Payload.Acc, reqVo.SharedAcc, reqVo.Prefix); err == nil {
 		return responseEntity.Error(ctx, api.Duplicate, err)
 	}
 
 	// add shared folder
-	err = con.dao.Add(ownerAcc, reqVo.SharedAcc, bucketName, reqVo.Prefix, reqVo.Permission)
+	err = con.dao.Add(webInput.Payload.Acc, reqVo.SharedAcc, bucketName, reqVo.Prefix, reqVo.Permission)
 	if err != nil {
 		return responseEntity.Error(ctx, api.DBError, err)
 	}
