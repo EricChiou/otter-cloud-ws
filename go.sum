@@ -10,6 +10,8 @@ github.com/EricChiou/gooq v0.0.0-20201015125909-cc403f753273 h1:G7WV6Z+TG2SUhp1+
 github.com/EricChiou/gooq v0.0.0-20201015125909-cc403f753273/go.mod h1:Y4Yw2T7HcqgFw8qOvBK6Is/YVs6eAcU2oBSJ+JoiYKQ=
 github.com/EricChiou/gooq v0.0.0-20210204021837-d198cd64d35e h1:GoKhwV0tytr/+AXUKqo8hjurUZtdp/BRRxsAdhnMqP0=
 github.com/EricChiou/gooq v0.0.0-20210204021837-d198cd64d35e/go.mod h1:Y4Yw2T7HcqgFw8qOvBK6Is/YVs6eAcU2oBSJ+JoiYKQ=
+github.com/EricChiou/gooq v0.0.0-20210224072511-9cc1be14d0a9 h1:Na6C5RM1GAIAxwc05YT6EU95Nc/IaWESbmw37fRJRa4=
+github.com/EricChiou/gooq v0.0.0-20210224072511-9cc1be14d0a9/go.mod h1:Y4Yw2T7HcqgFw8qOvBK6Is/YVs6eAcU2oBSJ+JoiYKQ=
 github.com/EricChiou/httprouter v0.0.0-20191104062635-693a8c144fab h1:BEzyrCQaDa50VEhbkaMibTKgVMB03ELOXa+wsjG96YQ=
 github.com/EricChiou/httprouter v0.0.0-20191104062635-693a8c144fab/go.mod h1:EU0vNQOFIs7zhbDdFAk7IXP5mzQQEiz4CoO4Vkdo3OM=
 github.com/EricChiou/httprouter v0.0.0-20200824013711-3174db4925cd h1:S97zU8nzEIuP0FdBmeKlfGF+7FrHwJeVQm1BlldoqWU=
