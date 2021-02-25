@@ -36,7 +36,17 @@ func (con *Controller) SignUp(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.Duplicate, err)
 	}
 
+	err := minio.CreateUserBucket(signUpData.Acc)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
 	activeCode := code.Get(64)
+	err = con.dao.SignUp(signUpData, activeCode)
+	if err != nil {
+		return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
+	}
+
 	mailData := mail.SendMailData{
 		From:    mail.EmailData{Name: mailconfig.FromName, Email: mailconfig.FromEmail},
 		To:      []mail.EmailData{{Name: signUpData.Name, Email: signUpData.Acc}},
@@ -45,16 +55,6 @@ func (con *Controller) SignUp(webInput interceptor.WebInput) apihandler.Response
 	}
 	if err := mail.Send(mailData); err != nil {
 		return responseEntity.Error(ctx, api.ServerError, err)
-	}
-
-	err := minio.CreateUserBucket(signUpData.Acc)
-	if err != nil {
-		return responseEntity.Error(ctx, api.MinioError, err)
-	}
-
-	err = con.dao.SignUp(signUpData, activeCode)
-	if err != nil {
-		return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
 	}
 
 	return responseEntity.OK(ctx, nil)
