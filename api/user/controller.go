@@ -71,12 +71,8 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 	}
 
 	signInBo, err := con.dao.SignIn(signInReqVo)
-	if err != nil {
-		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password"))
-	}
-
-	// check pwd
-	if signInBo.Pwd != sha3.Encrypt(signInReqVo.Pwd) {
+	// check account existing and pwd
+	if err != nil || signInBo.Pwd != sha3.Encrypt(signInReqVo.Pwd) {
 		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password"))
 	}
 
