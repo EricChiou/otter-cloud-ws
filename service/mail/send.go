@@ -17,15 +17,15 @@ func Send(mailData SendMailData) error {
 
 	resp, err := http.Post(mailconfig.APIURL, mailconfig.ContentType, bytes.NewBuffer(jsonBytes))
 	if err != nil {
-		return err
+		return errors.New("11111 " + err.Error())
 	}
 
 	var resVo Response
 	json.NewDecoder(resp.Body).Decode(&resVo)
-	// defer resp.Body.Close()
+	defer resp.Body.Close()
 
 	if resVo.Status != "ok" {
-		return errors.New(resVo.Trace)
+		return errors.New(resVo.Status + " " + resVo.Trace)
 	}
 
 	return nil
