@@ -206,7 +206,7 @@ func (con *Controller) ActivateAcc(webInput interceptor.WebInput) apihandler.Res
 	return responseEntity.OK(ctx, nil)
 }
 
-// ActivateAcc by active code
+// SendActivationCode by account
 func (con *Controller) SendActivationCode(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 
@@ -217,9 +217,19 @@ func (con *Controller) SendActivationCode(webInput interceptor.WebInput) apihand
 	}
 
 	activeCode := code.Get(64)
-	err := con.dao.SendActivationCode(reqVo.Acc, activeCode)
+	userName, err := con.dao.SendActivationCode(reqVo.Acc, activeCode)
 	if err != nil {
 		return responseEntity.Error(ctx, api.DBError, err)
+	}
+
+	mailData := mail.SendMailData{
+		From:    mail.EmailData{Name: mailconfig.FromName, Email: mailconfig.FromEmail},
+		To:      []mail.EmailData{{Name: userName, Email: reqVo.Acc}},
+		Subject: mailconfig.Subject,
+		Body:    mail.GetMailBody(userName, activeCode),
+	}
+	if err := mail.Send(mailData); err != nil {
+		return responseEntity.Error(ctx, api.ServerError, err)
 	}
 
 	return responseEntity.OK(ctx, nil)

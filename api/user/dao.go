@@ -270,16 +270,28 @@ func (dao *Dao) ActivateAcc(activeCode string) error {
 }
 
 // SendActivationCode by account
-func (dao *Dao) SendActivationCode(account, activeCode string) error {
+func (dao *Dao) SendActivationCode(account, activeCode string) (userName string, err error) {
 	var g mysql.Gooq
 
 	conditions := []gooq.Condition{c(userpo.ActiveCode).Eq("?")}
 	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.Acc).Eq("?"))
 	g.AddValues(activeCode, account)
 
-	if _, err := g.Exec(); err != nil {
-		return err
+	if _, err = g.Exec(); err != nil {
+		return "", err
 	}
 
-	return nil
+	g = mysql.Gooq{}
+	g.SQL.Select(userpo.Name).From(userpo.Table).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(account)
+
+	err = g.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&userName)
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return userName, nil
 }
