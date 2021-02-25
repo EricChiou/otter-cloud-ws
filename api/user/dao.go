@@ -2,7 +2,6 @@ package user
 
 import (
 	"database/sql"
-	"errors"
 	"otter-cloud-ws/api/common"
 	"otter-cloud-ws/bo/userbo"
 	"otter-cloud-ws/constants/userstatus"
@@ -259,12 +258,12 @@ func (dao *Dao) ActivateAcc(activeCode string) error {
 	}
 
 	g = mysql.Gooq{}
-	conditions := []gooq.Condition{c(userpo.Status).Eq(userstatus.Active)}
+	conditions := []gooq.Condition{c(userpo.Status).Eq("?")}
 	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.Acc).Eq("?"))
-	g.AddValues(account)
+	g.AddValues(userstatus.Active, account)
 
 	if _, err := g.Exec(); err != nil {
-		return errors.New(g.SQL.GetSQL())
+		return err
 	}
 
 	return nil
