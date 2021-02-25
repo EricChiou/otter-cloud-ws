@@ -87,8 +87,7 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 	).
 		From(userpo.Table).
 		Join(rolepo.Table).On(c(userpo.RoleCode).Eq(rolepo.Code)).
-		Where(c(userpo.Acc).Eq("?")).
-		And(c(userpo.Status).Eq(userstatus.Active))
+		Where(c(userpo.Acc).Eq("?"))
 	g.AddValues(signInReqVo.Acc)
 
 	rowMapper := func(row *sql.Row) error {
