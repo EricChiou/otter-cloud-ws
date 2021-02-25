@@ -22,7 +22,7 @@ func Send(mailData SendMailData) error {
 
 	var resVo Response
 	json.NewDecoder(resp.Body).Decode(&resVo)
-	defer resp.Body.Close()
+	// defer resp.Body.Close()
 
 	if resVo.Status != "ok" {
 		return errors.New(resVo.Trace)
