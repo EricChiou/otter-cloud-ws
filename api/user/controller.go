@@ -75,18 +75,14 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password"))
 	}
 
-	if signInBo.Status == string(userstatus.Inactive) {
-		return responseEntity.Error(ctx, api.AccInactive, errors.New("account inavtive"))
-	}
-
 	// check pwd
 	if signInBo.Pwd != sha3.Encrypt(signInReqVo.Pwd) {
 		return responseEntity.Error(ctx, api.DataError, errors.New("incorrect account or password"))
 	}
 
 	// check account status
-	if signInBo.Status != string(userstatus.Active) {
-		return responseEntity.Error(ctx, api.AccInactive, errors.New("the account is inactive"))
+	if signInBo.Status == string(userstatus.Inactive) {
+		return responseEntity.Error(ctx, api.AccInactive, errors.New("account inavtive"))
 	}
 
 	var signInResVo SignInResVo
