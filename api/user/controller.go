@@ -8,8 +8,7 @@ import (
 	"otter-cloud-ws/constants/userstatus"
 	"otter-cloud-ws/db/mysql"
 	"otter-cloud-ws/interceptor"
-
-	// "otter-cloud-ws/minio"
+	"otter-cloud-ws/minio"
 	"otter-cloud-ws/service/apihandler"
 	"otter-cloud-ws/service/code"
 	"otter-cloud-ws/service/jwt"
@@ -48,15 +47,15 @@ func (con *Controller) SignUp(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.ServerError, err)
 	}
 
-	// err := minio.CreateUserBucket(signUpData.Acc)
-	// if err != nil {
-	// 	return responseEntity.Error(ctx, api.MinioError, err)
-	// }
+	err := minio.CreateUserBucket(signUpData.Acc)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
 
-	// err = con.dao.SignUp(signUpData, activeCode)
-	// if err != nil {
-	// 	return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
-	// }
+	err = con.dao.SignUp(signUpData, activeCode)
+	if err != nil {
+		return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
+	}
 
 	return responseEntity.OK(ctx, nil)
 }
