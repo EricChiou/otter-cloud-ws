@@ -205,3 +205,22 @@ func (con *Controller) ActivateAcc(webInput interceptor.WebInput) apihandler.Res
 
 	return responseEntity.OK(ctx, nil)
 }
+
+// ActivateAcc by active code
+func (con *Controller) SendActivationCode(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// check body format
+	var reqVo SendActivationCodeReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	activeCode := code.Get(64)
+	err := con.dao.SendActivationCode(reqVo.Acc, activeCode)
+	if err != nil {
+		return responseEntity.Error(ctx, api.DBError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}
