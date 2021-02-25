@@ -20,5 +20,5 @@ func initUserAPI() {
 
 	// Put
 	put(groupName+"/update/:userAcc", true, []acl.Code{acl.UpdateUser}, controller.UpdateByUserAcc)
-	put(groupName+"/activate", true, []acl.Code{acl.UpdateUser}, controller.ActivateAcc)
+	put(groupName+"/activate", false, nil, controller.ActivateAcc)
 }
