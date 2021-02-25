@@ -17,7 +17,7 @@ func Send(mailData SendMailData) error {
 
 	resp, err := http.Post(mailconfig.APIURL, mailconfig.ContentType, bytes.NewBuffer(jsonBytes))
 	if err != nil {
-		return errors.New("11111 " + err.Error())
+		return errors.New(err.Error())
 	}
 
 	var resVo Response
@@ -25,7 +25,7 @@ func Send(mailData SendMailData) error {
 	defer resp.Body.Close()
 
 	if resVo.Status != "ok" {
-		return errors.New(resVo.Status + " " + resVo.Trace)
+		return errors.New(resVo.Trace)
 	}
 
 	return nil
