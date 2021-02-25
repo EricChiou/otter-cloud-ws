@@ -2,6 +2,7 @@ package user
 
 import (
 	"database/sql"
+	"errors"
 	"otter-cloud-ws/api/common"
 	"otter-cloud-ws/bo/userbo"
 	"otter-cloud-ws/constants/userstatus"
@@ -263,7 +264,7 @@ func (dao *Dao) ActivateAcc(activeCode string) error {
 	g.AddValues(account)
 
 	if _, err := g.Exec(); err != nil {
-		return err
+		return errors.New(g.SQL.GetSQL())
 	}
 
 	return nil
