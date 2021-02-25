@@ -17,6 +17,7 @@ const (
 	BucketName  string = "bucket_name"
 	CreatedDate string = "created_date"
 	UpdatedDate string = "updated_date"
+	ActiveCode  string = "active_code"
 )
 
 // Entity user table entity
@@ -30,4 +31,5 @@ type Entity struct {
 	BucketName  string `json:"bucket_name,omitempty"`
 	CreatedDate string `json:"creatDate,omitempty"`
 	UpdatedDate string `json:"updateDate,omitempty"`
+	ActiveCode  string `json:"activeCode,omitempty"`
 }

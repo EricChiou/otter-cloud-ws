@@ -37,7 +37,7 @@ func (dao *Dao) CheckAccExisting(acc string) (bool, error) {
 }
 
 // SignUp dao
-func (dao *Dao) SignUp(signUp SignUpReqVo) error {
+func (dao *Dao) SignUp(signUp SignUpReqVo, activeCode string) error {
 	run := func() interface{} {
 		var g mysql.Gooq
 
@@ -47,9 +47,18 @@ func (dao *Dao) SignUp(signUp SignUpReqVo) error {
 		// minio bucket id
 		bucketName := minio.GetUserBucketName(signUp.Acc)
 
-		g.SQL.Insert(userpo.Table, userpo.Acc, userpo.Pwd, userpo.Name, userpo.Status, userpo.BucketName).
-			Values("?", "?", "?", "?", "?")
-		g.AddValues(signUp.Acc, encryptPwd, signUp.Name, userstatus.Active, bucketName)
+		g.SQL.
+			Insert(
+				userpo.Table,
+				userpo.Acc,
+				userpo.Pwd,
+				userpo.Name,
+				userpo.Status,
+				userpo.BucketName,
+				userpo.ActiveCode,
+			).
+			Values("?", "?", "?", "?", "?", "?")
+		g.AddValues(signUp.Acc, encryptPwd, signUp.Name, userstatus.Inactive, bucketName, activeCode)
 
 		if _, err := g.Exec(); err != nil {
 			return err
@@ -78,7 +87,8 @@ func (dao *Dao) SignIn(signInReqVo SignInReqVo) (userbo.SignInBo, error) {
 	).
 		From(userpo.Table).
 		Join(rolepo.Table).On(c(userpo.RoleCode).Eq(rolepo.Code)).
-		Where(c(userpo.Acc).Eq("?"))
+		Where(c(userpo.Acc).Eq("?")).
+		And(c(userpo.Status).Eq(userstatus.Active))
 	g.AddValues(signInReqVo.Acc)
 
 	rowMapper := func(row *sql.Row) error {
