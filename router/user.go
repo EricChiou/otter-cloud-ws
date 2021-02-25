@@ -22,4 +22,5 @@ func initUserAPI() {
 	put(groupName+"/update/:userAcc", true, []acl.Code{acl.UpdateUser}, controller.UpdateByUserAcc)
 	put(groupName+"/activate", false, nil, controller.ActivateAcc)
 	put(groupName+"/send/activation/code", false, nil, controller.SendActivationCode)
+	put(groupName+"/reset/password", false, nil, controller.ResetPwd)
 }

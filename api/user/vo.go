@@ -43,6 +43,11 @@ type SendActivationCodeReqVo struct {
 	Acc string `json:"acc" req:"true"`
 }
 
+// ResetPwdReqVo request vo
+type ResetPwdReqVo struct {
+	Acc string `json:"acc" req:"true"`
+}
+
 // response vo
 
 // SignInResVo user sign in response data vo

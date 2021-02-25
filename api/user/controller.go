@@ -234,3 +234,33 @@ func (con *Controller) SendActivationCode(webInput interceptor.WebInput) apihand
 
 	return responseEntity.OK(ctx, nil)
 }
+
+// ResetPwd by account
+func (con *Controller) ResetPwd(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// check body format
+	var reqVo ResetPwdReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	newPwd := code.Get(8)
+
+	userName, err := con.dao.ResetPwd(reqVo.Acc, newPwd)
+	if err != nil {
+		return responseEntity.Error(ctx, api.DBError, err)
+	}
+
+	mailData := mail.SendMailData{
+		From:    mail.EmailData{Name: mailconfig.FromName, Email: mailconfig.FromEmail},
+		To:      []mail.EmailData{{Name: userName, Email: reqVo.Acc}},
+		Subject: mailconfig.ResetPwdSubject,
+		Body:    mail.GetResetPwdMailBody(userName, newPwd),
+	}
+	if err := mail.Send(mailData); err != nil {
+		return responseEntity.Error(ctx, api.ServerError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}

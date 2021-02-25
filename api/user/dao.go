@@ -289,9 +289,31 @@ func (dao *Dao) SendActivationCode(account, activeCode string) (userName string,
 		return row.Scan(&userName)
 	})
 
-	if err != nil {
+	return userName, err
+}
+
+// ResetPwd by account
+func (dao *Dao) ResetPwd(account, newPwd string) (userName string, err error) {
+	var g mysql.Gooq
+
+	// encrypt password
+	encryptNewPwd := sha3.Encrypt(newPwd)
+
+	conditions := []gooq.Condition{c(userpo.Pwd).Eq("?")}
+	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(encryptNewPwd, account)
+
+	if _, err := g.Exec(); err != nil {
 		return "", err
 	}
 
-	return userName, nil
+	g = mysql.Gooq{}
+	g.SQL.Select(userpo.Name).From(userpo.Table).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(account)
+
+	err = g.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&userName)
+	})
+
+	return userName, err
 }
