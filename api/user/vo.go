@@ -38,6 +38,11 @@ type ActivateReqVo struct {
 	ActiveCode string `json:"activeCode" req:"true"`
 }
 
+// SendActivationCodeReqVo request vo
+type SendActivationCodeReqVo struct {
+	Acc string `json:"acc" req:"true"`
+}
+
 // response vo
 
 // SignInResVo user sign in response data vo
