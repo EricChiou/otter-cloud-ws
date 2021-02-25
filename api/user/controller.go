@@ -187,3 +187,21 @@ func (con *Controller) GetUserFuzzyList(webInput interceptor.WebInput) apihandle
 
 	return responseEntity.OK(ctx, accountList)
 }
+
+// ActivateAcc by active code
+func (con *Controller) ActivateAcc(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// check body format
+	var reqVo ActivateReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	err := con.dao.ActivateAcc(reqVo.ActiveCode)
+	if err != nil {
+		return responseEntity.Error(ctx, api.DataError, err)
+	}
+
+	return responseEntity.OK(ctx, nil)
+}

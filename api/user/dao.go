@@ -239,3 +239,32 @@ func (dao *Dao) GetUserFuzzyList(keyword string) ([]string, error) {
 
 	return accountList, err
 }
+
+// ActivateAcc by active code
+func (dao *Dao) ActivateAcc(activeCode string) error {
+	var g mysql.Gooq
+
+	g.SQL.
+		Select(userpo.Acc).
+		From(userpo.Table).
+		Where(c(userpo.ActiveCode).Eq("?"))
+	g.AddValues(activeCode)
+
+	var account string
+	if err := g.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&account)
+	}); err != nil {
+		return err
+	}
+
+	g = mysql.Gooq{}
+	conditions := []gooq.Condition{c(userpo.Status).Eq(userstatus.Active)}
+	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(account)
+
+	if _, err := g.Exec(); err != nil {
+		return err
+	}
+
+	return nil
+}

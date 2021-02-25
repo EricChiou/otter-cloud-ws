@@ -33,6 +33,11 @@ type FuzzyListReqVo struct {
 	Keyword string `json:"keyword" req:"true"`
 }
 
+// ActivateReqVo request vo
+type ActivateReqVo struct {
+	ActiveCode string `json:"activeCode" req:"true"`
+}
+
 // response vo
 
 // SignInResVo user sign in response data vo
