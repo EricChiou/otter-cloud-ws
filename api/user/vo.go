@@ -17,8 +17,9 @@ type SignInReqVo struct {
 
 // UpdateReqVo update user request data vo
 type UpdateReqVo struct {
-	Name string `json:"name"`
-	Pwd  string `json:"pwd"`
+	Name   string `json:"name"`
+	OldPwd string `json:"oldPwd"`
+	NewPwd string `json:"newPwd"`
 }
 
 // ListReqVo List request vo

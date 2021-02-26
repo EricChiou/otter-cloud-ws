@@ -94,7 +94,7 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 	return responseEntity.OK(ctx, signInResVo)
 }
 
-// Update user data, POST: /user
+// Update user data, PUT: /user/update
 func (con *Controller) Update(webInput interceptor.WebInput) apihandler.ResponseEntity {
 	ctx := webInput.Context.Ctx
 	payload := webInput.Payload
@@ -104,8 +104,20 @@ func (con *Controller) Update(webInput interceptor.WebInput) apihandler.Response
 	if err := paramhandler.Set(webInput.Context, &updateData); err != nil {
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
-	if len(updateData.Name) == 0 && len(updateData.Pwd) == 0 {
-		return responseEntity.Error(ctx, api.FormatError, errors.New("need name or pwd"))
+	if len(updateData.Name) == 0 && len(updateData.NewPwd) == 0 {
+		return responseEntity.Error(ctx, api.FormatError, errors.New("need new name or new password"))
+	}
+
+	if len(updateData.OldPwd) > 0 && len(updateData.NewPwd) > 0 {
+		encryptOldPwd := sha3.Encrypt(updateData.OldPwd)
+		oldPwd, err := con.dao.GetPwd(payload.Acc)
+
+		if err != nil {
+			return responseEntity.Error(ctx, mysql.ErrMsgHandler(err), err)
+		}
+		if encryptOldPwd != oldPwd {
+			return responseEntity.Error(ctx, api.DataError, errors.New("password error"))
+		}
 	}
 
 	err := con.dao.Update(updateData, payload.Acc)
@@ -126,8 +138,8 @@ func (con *Controller) UpdateByUserAcc(webInput interceptor.WebInput) apihandler
 	if err := paramhandler.Set(webInput.Context, &updateData); err != nil {
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
-	if len(updateData.Name) == 0 && len(updateData.Pwd) == 0 {
-		return responseEntity.Error(ctx, api.FormatError, errors.New("need name or pwd"))
+	if len(updateData.Name) == 0 && len(updateData.NewPwd) == 0 {
+		return responseEntity.Error(ctx, api.FormatError, errors.New("need new name or new password"))
 	}
 
 	// check path param

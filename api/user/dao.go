@@ -36,6 +36,25 @@ func (dao *Dao) CheckAccExisting(acc string) (bool, error) {
 	return true, nil
 }
 
+// GetPwd by acc
+func (dao *Dao) GetPwd(acc string) (string, error) {
+	var g mysql.Gooq
+
+	g.SQL.Select(userpo.Pwd).From(userpo.Table).Where(c(userpo.Acc).Eq("?"))
+	g.AddValues(acc)
+
+	var pwd string
+	err := g.QueryRow(func(row *sql.Row) error {
+		return row.Scan(&pwd)
+	})
+
+	if err != nil {
+		return "", err
+	}
+
+	return pwd, nil
+}
+
 // SignUp dao
 func (dao *Dao) SignUp(signUp SignUpReqVo, activeCode string) error {
 	run := func() interface{} {
@@ -123,9 +142,9 @@ func (dao *Dao) Update(updateData UpdateReqVo, acc string) error {
 		conditions = append(conditions, c(userpo.Name).Eq("?"))
 		g.AddValues(updateData.Name)
 	}
-	if len(updateData.Pwd) != 0 {
+	if len(updateData.NewPwd) != 0 {
 		conditions = append(conditions, c(userpo.Pwd).Eq("?"))
-		g.AddValues(sha3.Encrypt(updateData.Pwd))
+		g.AddValues(sha3.Encrypt(updateData.NewPwd))
 	}
 
 	g.SQL.Update(userpo.Table).Set(conditions...).Where(c(userpo.Acc).Eq("?"))
