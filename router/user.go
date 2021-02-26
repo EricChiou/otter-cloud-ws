@@ -19,7 +19,7 @@ func initUserAPI() {
 	post(groupName, true, nil, controller.Update)
 
 	// Put
-	put(groupName+"/update", true, []acl.Code{acl.UpdateUser}, controller.Update)
+	put(groupName+"/update", true, nil, controller.Update)
 	put(groupName+"/update/:userAcc", true, []acl.Code{acl.UpdateUser}, controller.UpdateByUserAcc)
 	put(groupName+"/activate", false, nil, controller.ActivateAcc)
 	put(groupName+"/send/activation/code", false, nil, controller.SendActivationCode)
