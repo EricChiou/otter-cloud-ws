@@ -35,6 +35,7 @@ CREATE TABLE IF NOT EXISTS `user` (
   `bucket_name` varchar(56) NOT NULL,
   `created_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
   `updated_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  `active_code` VARCHAR(64),
   PRIMARY KEY (`id`),
   INDEX `user_role_code_FK_idx` (`role_code` ASC) INVISIBLE,
   UNIQUE INDEX `acc_UNIQUE` (`acc` ASC) VISIBLE,
