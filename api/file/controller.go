@@ -49,6 +49,7 @@ func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.Response
 	if len(prefix) > 0 && !strings.HasSuffix(prefix, "/") {
 		prefix = prefix + "/"
 	}
+	prefix = strings.ReplaceAll(prefix, "//", "/")
 
 	fileHeader, _ := ctx.FormFile("file")
 	if fileHeader == nil {
