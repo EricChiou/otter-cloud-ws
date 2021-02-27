@@ -60,7 +60,7 @@ func (con *Controller) Upload(webInput interceptor.WebInput) apihandler.Response
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	return responseEntity.OK(ctx, nil)
+	return responseEntity.OK(ctx, prefix+" "+fileHeader.Filename)
 }
 
 // GetPreview get object preview
