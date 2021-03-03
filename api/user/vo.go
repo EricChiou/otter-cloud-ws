@@ -11,8 +11,9 @@ type SignUpReqVo struct {
 
 // SignInReqVo user sign in request data vo
 type SignInReqVo struct {
-	Acc string `json:"acc" req:"true"`
-	Pwd string `json:"pwd" req:"true"`
+	Acc        string `json:"acc" req:"true"`
+	Pwd        string `json:"pwd" req:"true"`
+	RememberMe bool   `json:"rememberMe"`
 }
 
 // UpdateReqVo update user request data vo

@@ -9,11 +9,13 @@ import (
 	"github.com/EricChiou/httprouter"
 )
 
+// WebInput api web input
 type WebInput struct {
 	Context *httprouter.Context
 	Payload jwt.Payload
 }
 
+// Set api interceptor
 func Set(context *httprouter.Context, needToken bool, aclCodes []acl.Code, run func(WebInput) apihandler.ResponseEntity) apihandler.ResponseEntity {
 	webInput := WebInput{
 		Context: context,
@@ -24,7 +26,7 @@ func Set(context *httprouter.Context, needToken bool, aclCodes []acl.Code, run f
 	webInput.Payload = payload
 	if needToken && err != nil {
 		var responseEntity apihandler.ResponseEntity
-		return responseEntity.Error(context.Ctx, api.TokenError, nil)
+		return responseEntity.Error(context.Ctx, api.TokenError, err)
 	}
 
 	// check acl

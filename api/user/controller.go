@@ -83,9 +83,11 @@ func (con *Controller) SignIn(webInput interceptor.WebInput) apihandler.Response
 
 	var signInResVo SignInResVo
 	token, _ := jwt.Generate(
+		ctx,
 		signInBo.Acc,
 		signInBo.Name,
 		signInBo.RoleCode,
+		signInReqVo.RememberMe,
 	)
 	signInResVo = SignInResVo{
 		Token: token,
