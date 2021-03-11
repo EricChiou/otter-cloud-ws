@@ -7,10 +7,21 @@ type ListReqVo struct {
 	Prefix string `json:"prefix" req:"false"`
 }
 
+// GetPreviewReqVo get preview url request vo
+type GetPreviewReqVo struct {
+	Prefix   string `json:"prefix" req:"false"`
+	FileName string `json:"fileName" req:"true"`
+}
+
 // GetPreviewURLReqVo get preview url request vo
 type GetPreviewURLReqVo struct {
 	Prefix   string `json:"prefix" req:"false"`
 	FileName string `json:"fileName" req:"true"`
+}
+
+// GetPreviewFileReqVo get preview url request vo
+type GetPreviewFileReqVo struct {
+	URL string `json:"url" req:"true"`
 }
 
 // DownloadFileReqVo download file request vo

@@ -68,7 +68,7 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 	ctx := webInput.Context.Ctx
 
 	// set param
-	var reqVo GetPreviewURLReqVo
+	var reqVo GetPreviewReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
@@ -81,6 +81,48 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 	}
 
 	resp, err := http.Get(URL.String())
+	if err != nil {
+		responseEntity.Error(ctx, api.ServerError, err)
+	}
+
+	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
+	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
+
+	return responseEntity.Empty()
+}
+
+// GetPreviewURL get object preview url
+func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetPreviewURLReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	bucketName, _ := con.userDao.GetBucketName(webInput.Payload.Acc)
+
+	URL, err := minio.PresignedGetObject(bucketName, reqVo.Prefix, reqVo.FileName, time.Second*60*60*24)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, GetPreviewURLResVo{URL: URL.String()})
+}
+
+// GetPreviewFile by preview url
+func (con *Controller) GetPreviewFile(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetPreviewFileReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	url, _ := url.QueryUnescape(reqVo.URL)
+	resp, err := http.Get(url)
 	if err != nil {
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
