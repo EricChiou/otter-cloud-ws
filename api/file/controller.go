@@ -122,8 +122,9 @@ func (con *Controller) GetPreviewFile(webInput interceptor.WebInput) apihandler.
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
 
-	url, _ := url.QueryUnescape(reqVo.URL)
-	resp, err := http.Get(url)
+	urlStr, _ := url.QueryUnescape(reqVo.URL)
+	urlBytes, _ := base64.StdEncoding.DecodeString(urlStr)
+	resp, err := http.Get(string(urlBytes))
 	if err != nil {
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
