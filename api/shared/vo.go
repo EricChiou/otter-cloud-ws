@@ -33,6 +33,13 @@ type GetSharedFileReqVo struct {
 	FileName string `json:"fileName" req:"true"`
 }
 
+// GetSharedFilePreviewReqVo request vo
+type GetSharedFilePreviewReqVo struct {
+	ID       int    `json:"id" req:"true"`
+	Prefix   string `json:"prefix" req:"true"`
+	FileName string `json:"fileName" req:"true"`
+}
+
 // GetSharedFilePreviewURLReqVo request vo
 type GetSharedFilePreviewURLReqVo struct {
 	ID       int    `json:"id" req:"true"`
@@ -108,4 +115,9 @@ type GetSharedFolderResVo struct {
 // GetShareableLinkResVo get shareable link request vo
 type GetShareableLinkResVo struct {
 	ShareableLink string `json:"shareableLink"`
+}
+
+// GetPreviewURLResVo get preview url response vo
+type GetPreviewURLResVo struct {
+	URL string `json:"url"`
 }

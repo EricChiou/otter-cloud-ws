@@ -222,7 +222,7 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 	ctx := webInput.Context.Ctx
 
 	// set param
-	var reqVo GetSharedFilePreviewURLReqVo
+	var reqVo GetSharedFilePreviewReqVo
 	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
 		return responseEntity.Error(ctx, api.FormatError, err)
 	}
@@ -246,6 +246,29 @@ func (con *Controller) GetPreview(webInput interceptor.WebInput) apihandler.Resp
 	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
 
 	return responseEntity.Empty()
+}
+
+// GetPreviewURL get shared object preview url
+func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.ResponseEntity {
+	ctx := webInput.Context.Ctx
+
+	// set param
+	var reqVo GetSharedFilePreviewURLReqVo
+	if err := paramhandler.Set(webInput.Context, &reqVo); err != nil {
+		return responseEntity.Error(ctx, api.FormatError, err)
+	}
+
+	sharedEntity, err := con.dao.CheckPermission(reqVo.ID, webInput.Payload.Acc, reqVo.Prefix)
+	if err != nil {
+		return responseEntity.Error(ctx, api.PermissionDenied, err)
+	}
+
+	URL, err := minio.PresignedGetObject(sharedEntity.BucketName, sharedEntity.Prefix, reqVo.FileName, time.Second*60*60*24)
+	if err != nil {
+		return responseEntity.Error(ctx, api.MinioError, err)
+	}
+
+	return responseEntity.OK(ctx, GetPreviewURLResVo{URL: URL.String()})
 }
 
 // Download shared file
