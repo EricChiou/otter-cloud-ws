@@ -14,6 +14,7 @@ func initSharedAPI() {
 	post(groupName+"/add", true, nil, controller.Add)
 	post(groupName+"/remove", true, nil, controller.Remove)
 	post(groupName+"/file/preview", true, nil, controller.GetPreview)
+	post(groupName+"/file/preview/url", true, nil, controller.GetPreviewURL)
 	post(groupName+"/file/download", true, nil, controller.Download)
 	post(groupName+"/file/shareableLink", true, nil, controller.GetShareableLink)
 	post(groupName+"/file/upload", true, nil, controller.UploadObject)
