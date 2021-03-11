@@ -108,7 +108,8 @@ func (con *Controller) GetPreviewURL(webInput interceptor.WebInput) apihandler.R
 		return responseEntity.Error(ctx, api.MinioError, err)
 	}
 
-	return responseEntity.OK(ctx, GetPreviewURLResVo{URL: URL.String()})
+	url := base64.StdEncoding.EncodeToString([]byte(URL.String()))
+	return responseEntity.OK(ctx, GetPreviewURLResVo{URL: url})
 }
 
 // GetPreviewFile by preview url
