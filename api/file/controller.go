@@ -129,7 +129,9 @@ func (con *Controller) GetPreviewFile(webInput interceptor.WebInput) apihandler.
 		responseEntity.Error(ctx, api.ServerError, err)
 	}
 
-	ctx.Response.Header.Add("Content-Type", "application/octet-stream")
+	ctx.Response.Header.Add("Accept-Ranges", resp.Header.Get("Accept-Ranges"))
+	ctx.Response.Header.Add("Content-Length", resp.Header.Get("Content-Length"))
+	ctx.Response.Header.Add("Content-Type", resp.Header.Get("Content-Type"))
 	ctx.SetBodyStream(resp.Body, int(resp.ContentLength))
 
 	return responseEntity.Empty()
