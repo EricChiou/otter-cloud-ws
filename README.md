@@ -4,7 +4,9 @@ Setting config in config.ini.
 This project use minio as file sytem.  
 You can learn how to use minio [here](https://docs.min.io/docs/minio-quickstart-guide.html).  
   
-Demo: [https://www.calicomoomoo.ml/otter-cloud/](https://www.calicomoomoo.ml/otter-cloud/)  
+Demo: [https://www.calicomoomoo.ml/otter-cloud/](https://www.calicomoomoo.ml/otter-cloud/)   
+Front End: [https://github.com/EricChiou/otter-cloud](https://github.com/EricChiou/otter-cloud)   
+
 ### Making config file
 Making config.ini with content below:  
 ```
