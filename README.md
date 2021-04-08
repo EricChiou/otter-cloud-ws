@@ -6,6 +6,9 @@ You can learn how to use minio [here](https://docs.min.io/docs/minio-quickstart-
   
 Demo: [https://www.calicomoomoo.ml/otter-cloud/](https://www.calicomoomoo.ml/otter-cloud/)   
 Front End: [https://github.com/EricChiou/otter-cloud](https://github.com/EricChiou/otter-cloud)   
+Test account:   
+&nbsp;&nbsp;&nbsp;&nbsp;acc: test@gmail.com   
+&nbsp;&nbsp;&nbsp;&nbsp;pwd: test   
 
 ### Making config file
 Making config.ini with content below:  
