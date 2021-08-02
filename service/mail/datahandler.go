@@ -2,7 +2,7 @@ package mail
 
 // GetMailBody for activattion account
 func GetMailBody(name, activeCode string) string {
-	activeURL := "https://www.calicomoomoo.ml/otter-cloud/activate/" + activeCode
+	activeURL := "https://www.calicomoomoo.com/otter-cloud/activate/" + activeCode
 
 	html := "<body>"
 	html += "  <div>"
